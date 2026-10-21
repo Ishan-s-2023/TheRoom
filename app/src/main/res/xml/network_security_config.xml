@@ -1,0 +1,10 @@
+<network-security-config>
+    <!-- Stock WLED serves HTTP and ws:// at user-selected LAN addresses. Room's
+         device transport still independently requires HTTPS and its pinned certificate. -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

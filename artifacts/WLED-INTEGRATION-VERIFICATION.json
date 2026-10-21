@@ -1,0 +1,45 @@
+{
+  "created_utc": "2026-10-21T12:03:36.110771+00:00",
+  "app_version": "0.3.0",
+  "version_code": 5,
+  "apk": "RoomController-final.apk",
+  "apk_sha256": "917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4",
+  "frozen_build_report": "RoomController-final-verification.json",
+  "tests": 27,
+  "lint": {
+    "Warning": 27,
+    "Information": 4
+  },
+  "source_unchanged_after_build": true,
+  "firmware_handover": "ESP32-WLED-MIGRATION.md",
+  "firmware_modified": false,
+  "esp32_flashed": false,
+  "reviewed_wled_commit": "3cdb5108b924ec26dec81d2c92962b70b185bd01",
+  "reviewed_android_commit": "7e164a8a6ce0aa654536abdd2e7aaa940adfb0ff",
+  "emulator": {
+    "device": "emulator-5554",
+    "controller": "localhost QA contract fixture, not ESP32",
+    "checks": [
+      "Native WLED identification and persisted controller",
+      "Native preset POST and state readback",
+      "Upstream WLED power and effect commands reach fixture",
+      "Room dark Forest and light Pearl styles in live WLED DOM",
+      "Save-document picker exported exact presets JSON",
+      "File chooser returned correct JSON name and 101 content bytes",
+      "Original WLED restore function sent 279-byte multipart request"
+    ],
+    "request_log": "wled-emulator-requests.jsonl",
+    "export_roundtrip": "wled-export-roundtrip.json",
+    "screenshots": [
+      "wled-final-native.png",
+      "wled-pearl.png",
+      "wled-pearl-panel.png"
+    ]
+  },
+  "limits": [
+    "Combined WLED/Room firmware is a separate implementation specified in the handover.",
+    "No physical LED/mic/IR/OLED/encoder verification, real-router mDNS verification, live Spotify test or on-device OTA test.",
+    "No automatic download or installation of stock WLED binaries; updates use controller upload flow.",
+    "APK does not contain the QA fixture or reviewed upstream web UI files; full UI comes from the controller."
+  ]
+}

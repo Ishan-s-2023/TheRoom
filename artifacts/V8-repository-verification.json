@@ -1,0 +1,22 @@
+{
+  "delivery": "V8",
+  "repository": "Ishan-s-2023/TheRoom",
+  "git_root": "android",
+  "target_branch": "main",
+  "staged_files": 115,
+  "apk_copies": 6,
+  "unique_apk_hashes": 5,
+  "knowledge_copies": 40,
+  "android_compiler_inputs_unchanged": 48,
+  "known_plaintext_credentials_in_staged_text": 0,
+  "private_key_markers_in_staged_text": 0,
+  "raw_config_ignored": true,
+  "local_properties_ignored": true,
+  "historical_apks_contain_private_device_credentials": true,
+  "app_version": "0.3.0",
+  "version_code": 5,
+  "app_rebuilt": false,
+  "firmware_modified_or_flashed": false,
+  "version_tooling_tests_passed": 9,
+  "remote_push_status": "pending"
+}

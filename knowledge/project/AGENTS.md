@@ -1,0 +1,7 @@
+# Project delivery version rule
+
+Every time a project change is delivered as a new codebase, assign and visibly state its version. Update VERSION.md, the main handoff document and the delivery entry point together. Label any newly generated codebase archive with the same delivery version. Never silently overwrite a previously delivered release under the same version.
+
+The current delivery is **SmartRoom Controller — Version 8 (V8)**. The next changed codebase delivery must receive the next sequential delivery version. Keep this project delivery number distinct from firmware runtime versions, Android versionName/versionCode and OTA monotonic version numbers; report their actual values rather than implying they changed or were installed. Update component versions when their code changes, and identify build/test/installation status accurately.
+
+For Android, maintain `versions.md` and `artifacts/android-release-history.json`. Every newly generated released APK must have a strictly increasing versionCode; update versionName when app code changes. Use `scripts/build-final-apk.py`, which checks this before building and archives immutable, versioned APK/source/evidence copies. Never rename an unchanged APK as if its internal Android version changed. Preserve all existing bytes of `ESP32_APP_SYNC_CONTEXT.md`; add synchronization/release information only by appending. The current app baseline is 0.3.0 / code 5; its next new build needs at least code 6.

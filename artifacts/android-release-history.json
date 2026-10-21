@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "releases": [
+    {
+      "release_id": "ROOM-ANDROID-0.3.0+5",
+      "version_name": "0.3.0",
+      "version_code": 5,
+      "project_delivery": 7,
+      "apk_sha256": "917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4",
+      "original_build_snapshot_utc": "20261021T114733Z",
+      "registered_utc": "2026-10-21T12:19:40.321103+00:00",
+      "firmware_source_at_registration": "1.1.4-music",
+      "firmware_installation": "not queried or changed by this app release registration",
+      "test_count": 27,
+      "lint": {
+        "Warning": 27,
+        "Information": 4
+      },
+      "artifacts": {
+        "apk": "artifacts/android-releases/0.3.0-code5/RoomController-V7-android-0.3.0-code5.apk",
+        "source": "artifacts/android-releases/0.3.0-code5/RoomController-V7-android-0.3.0-code5-source.zip",
+        "verification": "artifacts/android-releases/0.3.0-code5/RoomController-V7-android-0.3.0-code5-verification.json"
+      },
+      "artifact_sha256": {
+        "apk": "917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4",
+        "source": "8e494b7b61a4e837beccc441519af9bd03a2f8be35afe3b0a03ecc922f564761",
+        "verification": "33e7ee18bfeb92cdba5a9d6ce63e9c22431aba04fe9e57a1d681298c0170fc86"
+      }
+    }
+  ]
+}

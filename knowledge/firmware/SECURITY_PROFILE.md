@@ -1,0 +1,25 @@
+# Security profile and credential lifecycle
+
+## Current development profile
+The ordinary Arduino IDE build preserves the existing device identity and does not program eFuses, erase NVS, change the partition table, or enable flash encryption. TLS and a unique bearer token protect network transport; they do not protect a readable flash chip. Runtime security fields report secure boot, flash encryption, encrypted default NVS, whether protection is required, and whether the policy is satisfied. Never describe an unprotected development build as having encrypted stored secrets.
+
+## Protected deployment profile
+Compile with `-DROOM_REQUIRE_PROTECTED_FLASH=1` only after preparing a compatible SDK, bootloader and partition layout. The runtime policy requires ALL of: secure boot enabled, flash encryption active, SDK NVS encryption enabled, an encrypted NVS key partition and a readable NVS encryption configuration. When unmet, the network service does not start; trusted physical USB maintenance remains available. Pending OTA images that fail the policy cannot pass application health checks.
+
+The installed Arduino core is precompiled with secure boot and flash encryption disabled and without encrypted NVS. Changing a sketch macro cannot rebuild those features into that SDK. A production profile requires an ESP-IDF/Arduino-as-component build or an equivalently rebuilt Arduino core and bootloader. Select the secure-boot scheme, signed-boot keys, chip minimum revision, UART/JTAG policy, flash-encryption mode and recovery method against the exact board and Espressif SDK. The software OTA manifest signing key is a separate trust mechanism from the secure-boot signing key. Keep both private; do not substitute one for the other silently.
+
+Required SDK settings include CONFIG_SECURE_BOOT=y, CONFIG_FLASH_ENCRYPTION_ENABLED=y, CONFIG_NVS_ENCRYPTION=y and CONFIG_APP_ROLLBACK_ENABLE=y. The encrypted NVS key partition must be type data, subtype nvs_keys, have its encrypted flag, and be included in an independently reviewed flash layout retaining two sufficiently large OTA application slots. Do not flash a template layout onto the currently configured controller: partition changes can destroy data. Default NVS must be initialized by the encryption-enabled SDK before Preferences is used. The installed nvs_flash.h documents that nvs_flash_init performs this initialization when CONFIG_NVS_ENCRYPTION is enabled.
+
+Run tools/check_security_profile.py against the actual rebuilt sdkconfig and partition CSV. A passing static check is not proof that eFuses were provisioned: verify the runtime security fields on the intended device. No production-protected binary or irreversible security provisioning is claimed in this source release. That device lifecycle requires explicit approval and a recoverable staging device.
+
+## Owner-token rotation
+The API accepts rotate_owner_token with confirm:true and a randomly generated 43..86-character URL-safe token. It persists one active owner token in NVS; subsequent requests using the prior token are rejected. Existing devices keep using their original compiled unique token until rotation is requested. Use tools/rotate_device_token.py from a trusted PC; it generates and retains recovery material privately before sending the rotation and never prints tokens. This changes owner authorization only; it does not rotate the TLS certificate, AP password or OTA public key.
+
+If a response is lost after rotation, the private pending-token file allows a retry of verification with the new token. Do not blindly generate another token. If both token copies are lost, the trusted physical USB command reset_owner_token with confirm:true removes the NVS override and restores the original per-device compiled owner token. This command is rejected over HTTPS, including for an authenticated owner. Recover the original token from the matching private pairing archive. This is an explicit physical-maintenance recovery path, not a shared default or network authentication bypass.
+
+Retain the device's matching DeviceSecrets.h and .device-private directory in a private offline archive. Changing the TLS identity/AP password/signing public key requires an explicit re-provisioning release and re-pairing clients. Do not regenerate identity files silently or expose them in source ZIPs. Restoring a room-data backup does not replace credentials or electrical configuration.
+
+## Acceptance gates
+Before a protected deployment: approve the exact lifecycle; test signed boot, encrypted NVS read/write, power interruption, OTA rollback, key custody, owner rotation/recovery and the selected physical recovery interface on staging hardware. Record the device's actual security bits and retain a recovery procedure compatible with the chosen UART policy. These operations cannot be validated by host fixtures alone.
+
+On Windows, os.chmod is not a complete user-access ACL. Protect the private folder through Windows account permissions and an appropriately encrypted offline archive; source packaging exclusion is not disk encryption.

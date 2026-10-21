@@ -1,0 +1,205 @@
+{
+  "project_delivery": "V8",
+  "files": [
+    {
+      "source": "AGENTS.md",
+      "copy": "knowledge/project/AGENTS.md",
+      "sha256": "ccadd7028306dd7485ce321d095ec1c417394f678b7bacf6bfeea710f935f00b"
+    },
+    {
+      "source": "APP_FEATURES.md",
+      "copy": "knowledge/project/APP_FEATURES.md",
+      "sha256": "3cb48e5271891ded9010d3e155816b6e730754c72c353919f176274e2d498711"
+    },
+    {
+      "source": "CODEX_INTEGRATION_PROMPT.md",
+      "copy": "knowledge/project/CODEX_INTEGRATION_PROMPT.md",
+      "sha256": "181f4aad7c3a9f244f5747c3907424904f7d4ceabd2c52642dbb7a0a96e7cd5a"
+    },
+    {
+      "source": "ESP32_APP_SYNC_CONTEXT.md",
+      "copy": "knowledge/project/ESP32_APP_SYNC_CONTEXT.md",
+      "sha256": "bb96e94a9c698182437d97b0b5061f397b2e1c441f5d13b8e2bcda60c9a830f8"
+    },
+    {
+      "source": "ESP32_Smart_Room_Controller_Requirements.md",
+      "copy": "knowledge/project/ESP32_Smart_Room_Controller_Requirements.md",
+      "sha256": "7a02690d4f12fee77725e33d636302b2cebdfc3294b162cd53877d2cb284b099"
+    },
+    {
+      "source": "MUSIC_REACTIVE_SYSTEM_COMPLETE_GUIDE.md",
+      "copy": "knowledge/project/MUSIC_REACTIVE_SYSTEM_COMPLETE_GUIDE.md",
+      "sha256": "ca56ab6a7eba917c39a2aacbd2385cd28cad30acf06840818249fbd921790e98"
+    },
+    {
+      "source": "MUSIC_TO_LIGHT_INTEGRATION_MANUAL.md",
+      "copy": "knowledge/project/MUSIC_TO_LIGHT_INTEGRATION_MANUAL.md",
+      "sha256": "78d44222eb8c338f12e25c4b16daffa4349110b34c30640d0e8e127faaab94d2"
+    },
+    {
+      "source": "MUSIC_TO_LIGHT_PIPELINE.md",
+      "copy": "knowledge/project/MUSIC_TO_LIGHT_PIPELINE.md",
+      "sha256": "13d97751305bb6f36ccafba75f69da01422fde8cc8889a188165c5bb121b9128"
+    },
+    {
+      "source": "PROJECT_STRUCTURE.md",
+      "copy": "knowledge/project/PROJECT_STRUCTURE.md",
+      "sha256": "21aceba4a73c40d13839c51eb694606aa106ddb78cef955f593bde12df761e3e"
+    },
+    {
+      "source": "README.md",
+      "copy": "knowledge/project/README.md",
+      "sha256": "042cade5392ad85233519f804bed9fdc5232d836457bc1bbad7a2d1bd7269e9b"
+    },
+    {
+      "source": "START_HERE_ESP32.md",
+      "copy": "knowledge/project/START_HERE_ESP32.md",
+      "sha256": "eaecf7ccf940fa34a6cb95b097a4e402b53318e8d1038b8f40e25e2cbe132c5a"
+    },
+    {
+      "source": "VERSION.md",
+      "copy": "knowledge/project/VERSION.md",
+      "sha256": "4ef94142a6c350ba9ff92ec82b8b8579bb87e611db7b2da6811b0cea46523561"
+    },
+    {
+      "source": "versions.md",
+      "copy": "knowledge/project/versions.md",
+      "sha256": "b113ab2daf623b860d7f09e968a646b16ab7bda8080997022b2795c1885f108f"
+    },
+    {
+      "source": "docs/APPROVED_PROFILE.md",
+      "copy": "knowledge/docs/APPROVED_PROFILE.md",
+      "sha256": "0be30acee0e7918ab96caa0a708abab1ddf58aeeee93f886625196405fe89e7c"
+    },
+    {
+      "source": "docs/CONNECTION_GUIDE.md",
+      "copy": "knowledge/docs/CONNECTION_GUIDE.md",
+      "sha256": "75a316166d63834606f2028c40a3abaf4fea159195ec802e05447655594224e1"
+    },
+    {
+      "source": "docs/DIRECT_ANDROID_SETUP.md",
+      "copy": "knowledge/docs/DIRECT_ANDROID_SETUP.md",
+      "sha256": "109762dd347c025094c6401afca90ccf54a1fa768c0800897f615ebd27e5fbdf"
+    },
+    {
+      "source": "docs/FINAL_APK.md",
+      "copy": "knowledge/docs/FINAL_APK.md",
+      "sha256": "0a5a9f6d35976edd84458b100ae4d58e5d688302231893ecca3acc26212b49ae"
+    },
+    {
+      "source": "docs/IMPLEMENTATION_STATUS.md",
+      "copy": "knowledge/docs/IMPLEMENTATION_STATUS.md",
+      "sha256": "fb9e727d89218e12a9463d331760b0239e09941e6ee43901bc29e2c7f96d915e"
+    },
+    {
+      "source": "docs/PROTOCOL.md",
+      "copy": "knowledge/docs/PROTOCOL.md",
+      "sha256": "d359ef7d1248544f62299a254ad47fd0477cdede4751a4106559d092defdebe0"
+    },
+    {
+      "source": "docs/REACT_COMPONENTS.md",
+      "copy": "knowledge/docs/REACT_COMPONENTS.md",
+      "sha256": "62a05de0c3a040453d7fa0a668312973239021b13bcef23bb7e31c4ef9a1763a"
+    },
+    {
+      "source": "docs/SPOTIFY_APP_CONNECTION.md",
+      "copy": "knowledge/docs/SPOTIFY_APP_CONNECTION.md",
+      "sha256": "333f4ae2b6e7c32e4d4db22715c3f6fdad4d721b8a5865eb50aa42903a6e21d5"
+    },
+    {
+      "source": "docs/SPOTIFY_RESPONSIVENESS.md",
+      "copy": "knowledge/docs/SPOTIFY_RESPONSIVENESS.md",
+      "sha256": "4c2015b8f7efc62972b5327724400c0ec9ea53c51d1877b851bcde0cd9e653f3"
+    },
+    {
+      "source": "docs/UI_REVIEW.md",
+      "copy": "knowledge/docs/UI_REVIEW.md",
+      "sha256": "0011e822f0934254eb3129a18d968d2af893f8e3e0ac2fe56beb9506fce1b21b"
+    },
+    {
+      "source": "docs/VALIDATION.md",
+      "copy": "knowledge/docs/VALIDATION.md",
+      "sha256": "25f494fad5fe1c8f3f2c7e78c87be0631eacaa7fa501216ea3959721b04f5daf"
+    },
+    {
+      "source": "docs/WLED_INTEGRATION.md",
+      "copy": "knowledge/docs/WLED_INTEGRATION.md",
+      "sha256": "31939da2db2cafa5a4dc50ce58abb75e1e24a2854ddb4d62bdc7953b3f2f8415"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/API.md",
+      "copy": "knowledge/firmware/API.md",
+      "sha256": "c70b47dd18214151f7f5713e33f5ee262d21664e8f3fbe8b423171506f295c51"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/BUILD_VERIFICATION.md",
+      "copy": "knowledge/firmware/BUILD_VERIFICATION.md",
+      "sha256": "82b34d3d3ef3d97eb8367c3738ce0c9673e8562001b0bb1d21c214e10ef7e4fa"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/COMPLETION_TODO.md",
+      "copy": "knowledge/firmware/COMPLETION_TODO.md",
+      "sha256": "878cbda94214b118622e918f5b166f41bdc7e41b57d5420983516b52306ab2ed"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/DEVICE_ACCEPTANCE.md",
+      "copy": "knowledge/firmware/DEVICE_ACCEPTANCE.md",
+      "sha256": "c114a637d197e734405677eb711b0d806780ca1c702961d881d7296125c951d6"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/DEVICE_LOG_FOLLOWUP.md",
+      "copy": "knowledge/firmware/DEVICE_LOG_FOLLOWUP.md",
+      "sha256": "bf2ecb8c0cc61df0d30924c6685bde259f3809aff935e54d520e98ec199e9d21"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/README.md",
+      "copy": "knowledge/firmware/README.md",
+      "sha256": "d39b0b0edaae7babc3dbaecbe9144b7b240083b089a529d45a991dd073d60456"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/RELEASE_1_1_0.md",
+      "copy": "knowledge/firmware/RELEASE_1_1_0.md",
+      "sha256": "77c2f65233a02413a3fd50f5b0116c4c0b9f44d80150722d5b1b3d8a505a9450"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/RELEASE_1_1_1.md",
+      "copy": "knowledge/firmware/RELEASE_1_1_1.md",
+      "sha256": "1dfbc3305dc718872688ce0b9c934a9281b2b465c75342ee1ee08002522c5bdc"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/RELEASE_1_1_2_HTTP.md",
+      "copy": "knowledge/firmware/RELEASE_1_1_2_HTTP.md",
+      "sha256": "fe98d25f6aecfaedeef201cc42fe3b08beae0a78ff913991ac50c2c6b9cd9130"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/RELEASE_1_1_3_CONTROLS.md",
+      "copy": "knowledge/firmware/RELEASE_1_1_3_CONTROLS.md",
+      "sha256": "1aa5df07c39de3b3ee1daf86b5ed8a7ba3446cc8c6e88281d9af74c10c1ad401"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/RELEASE_V6_1_1_4_MUSIC.md",
+      "copy": "knowledge/firmware/RELEASE_V6_1_1_4_MUSIC.md",
+      "sha256": "b27c4e0ac4728fd9078bea6f932111b81403b38d55cebb3ec33b6bb9f0cf09f1"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/REQUIREMENTS_COVERAGE.md",
+      "copy": "knowledge/firmware/REQUIREMENTS_COVERAGE.md",
+      "sha256": "9a58ed3dfa91c703a082dfeed66cde4813b26b4842ba33281e88000ba7396b81"
+    },
+    {
+      "source": "SmartRoomController_Complete_Source/SmartRoomController/SECURITY_PROFILE.md",
+      "copy": "knowledge/firmware/SECURITY_PROFILE.md",
+      "sha256": "6fe83c6bc6a69f8702df7030f1b78ffd121d68340f7aef40cb37de1d46c6541a"
+    },
+    {
+      "source": "artifacts/ESP32-WLED-MIGRATION.md",
+      "copy": "knowledge/artifacts/ESP32-WLED-MIGRATION.md",
+      "sha256": "86c0650408a1492066e859f8f2efc6d7ae456f69a4b6eefd0a10427d3c39aeb9"
+    },
+    {
+      "source": "artifacts/V7-app-sync-append.md",
+      "copy": "knowledge/artifacts/V7-app-sync-append.md",
+      "sha256": "b37807ca13f1c41ce919c423fb9c856c16e8e320414319b20d4d8839aa5fe044"
+    }
+  ]
+}

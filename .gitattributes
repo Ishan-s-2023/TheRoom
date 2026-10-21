@@ -1,0 +1,5 @@
+# Preserve copied knowledge/APK bytes across Windows and Linux checkouts.
+* -text
+gradlew text eol=lf
+*.apk binary
+*.jar binary

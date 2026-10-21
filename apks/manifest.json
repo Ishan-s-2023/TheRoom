@@ -1,0 +1,60 @@
+{
+  "project_delivery": "V8",
+  "files": [
+    {
+      "original_path": ".tools/apk-backups/RoomController-before-WLED-0.2.2.apk",
+      "copy": "apks/workspace-tools/apk-backups/RoomController-before-WLED-0.2.2.apk",
+      "bytes": 17442885,
+      "sha256": "cfe6a99ae3885928af0bd3d8f4bf7cc9c55d4363609eb31250f5de22185ac4e8",
+      "version_name": "0.2.2",
+      "version_code": 4,
+      "verified_final": false
+    },
+    {
+      "original_path": ".tools/apk-backups/RoomController-final-before-spotify-c9330be2.apk",
+      "copy": "apks/workspace-tools/apk-backups/RoomController-final-before-spotify-c9330be2.apk",
+      "bytes": 17425998,
+      "sha256": "09b4d2c4ef33efd8bfdf2c4fe0790cacea6bdb52b5c0bef79989a9a1edc3a77a",
+      "version_name": "0.2.0",
+      "version_code": 2,
+      "verified_final": false
+    },
+    {
+      "original_path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "copy": "apks/android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 18718909,
+      "sha256": "060b85e07edd125ab460ec40712751e2e740001679a412871711be9dc83688a5",
+      "version_name": "0.3.0",
+      "version_code": 5,
+      "verified_final": false
+    },
+    {
+      "original_path": "artifacts/RoomController-final.apk",
+      "copy": "apks/artifacts/RoomController-final.apk",
+      "bytes": 18176029,
+      "sha256": "917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4",
+      "version_name": "0.3.0",
+      "version_code": 5,
+      "verified_final": true
+    },
+    {
+      "original_path": "artifacts/android-releases/0.3.0-code5/RoomController-V7-android-0.3.0-code5.apk",
+      "copy": "apks/artifacts/android-releases/0.3.0-code5/RoomController-V7-android-0.3.0-code5.apk",
+      "bytes": 18176029,
+      "sha256": "917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4",
+      "version_name": "0.3.0",
+      "version_code": 5,
+      "verified_final": true
+    },
+    {
+      "original_path": "artifacts/spotify-latency-fix/RoomController-before-responsiveness.apk",
+      "copy": "apks/artifacts/spotify-latency-fix/RoomController-before-responsiveness.apk",
+      "bytes": 17426413,
+      "sha256": "a33853f5f24c34de7b324909fde109431fa184c4b183e28504b470cc1afd815b",
+      "version_name": "0.2.1",
+      "version_code": 3,
+      "verified_final": false
+    }
+  ],
+  "excluded": "SDK/emulator/vendor system APKs are not Room releases"
+}
