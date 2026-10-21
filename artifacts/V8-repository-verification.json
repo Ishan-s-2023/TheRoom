@@ -18,5 +18,8 @@
   "app_rebuilt": false,
   "firmware_modified_or_flashed": false,
   "version_tooling_tests_passed": 9,
-  "remote_push_status": "pending"
+  "remote_push_status": "initial commit pushed to origin/main and remote SHA verified",
+  "published_initial_commit": "ba6c4dddd1722d9f97a3f5d07c20f73938bbf1ab",
+  "tracked_files": 116,
+  "verification_scope": "This record verifies the initial published commit; later evidence-only commits may follow."
 }
