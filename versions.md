@@ -273,5 +273,21 @@ Project delivery **V30**. Android source updated to **0.5.6 / versionCode 27**.
 - Fully reconciled and restored the active Android codebase in the workspace `android/` directory.
 - See section 33 of `ESP32_APP_SYNC_CONTEXT.md`.
 
+## V31 — Exhaustive Step-by-Step README Documentation & Developer Guides
+
+Project delivery **V31**. Android source baseline remains **0.5.6 / versionCode 27**. Verified offline APK baseline remains **0.3.0 / versionCode 5**.
+- Completely rewrote and expanded `README.md` into an exhaustive, production-grade guide with step-by-step instructions:
+  - Complete project architecture and file directory layout.
+  - Development prerequisites and system requirements (JDK 17, Android SDK API 34).
+  - Step-by-step local build and test execution via Gradle wrapper (`gradlew`) and Python test suites.
+  - Comprehensive Spotify Developer App setup guide covering registration, redirect URI configuration (`in.roomcontroller.app://spotify/callback`), User Management whitelisting, and in-app Client ID entry.
+  - Step-by-step hardware pairing instructions for ESP32 Room Controller (certificate fingerprint pinning) and WLED (IP discovery & segment configuration).
+  - Detailed feature breakdown of 180+ WLED effect engines, palettes, 2D matrix controls, live UDP streaming, vinyl turntable Spotify player, 3-way magic shuffle, liked songs library, and AudioReactive microphone DSP equalizer.
+  - Comprehensive troubleshooting matrix addressing common Spotify, build, and hardware networking issues.
+  - Security and privacy architecture detailing local-first design and zero hardcoded credentials.
+- Updated root `README.md` with modern quick links and cross-references.
+- See section 34 of `ESP32_APP_SYNC_CONTEXT.md`.
+
+
 
 

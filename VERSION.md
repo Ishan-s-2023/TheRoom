@@ -1,3 +1,23 @@
+# SmartRoom Controller — Version 31 (V31)
+
+Current project delivery, 25 October 2026 (Asia/Calcutta). Previous delivery: V30.
+
+- Delivery version: **V31**; previous delivery: **V30**.
+- Fully updated, comprehensive, and step-by-step documentation delivery for **TheRoom** Android application:
+  - Completely rewrote and expanded `android/README.md` into an exhaustive, production-grade guide covering:
+    - Architecture, tech stack, and module breakdown across Kotlin Compose files.
+    - Prerequisites, JDK 17 setup, and step-by-step local build commands with Gradle wrapper.
+    - End-to-end Spotify Developer App registration, Redirect URI setup (`in.roomcontroller.app://spotify/callback`), User Management whitelisting, and in-app Client ID configuration.
+    - Dual hardware pairing walk-through for ESP32 Room Controller (certificate pinning) and WLED (IP discovery & segment configuration).
+    - Detailed feature walk-throughs: 180+ WLED effect engines, palettes, 2D matrix, live UDP streaming, vinyl turntable Spotify player, 3-way magic shuffle, liked songs library, guided IR remote learning, and AudioReactive microphone DSP equalizer.
+    - Comprehensive troubleshooting matrices for Spotify OAuth, Android SDK/Gradle build issues, and LAN/Wi-Fi connectivity.
+    - Security and privacy model emphasizing local-first architecture and zero hardcoded credentials.
+  - Updated root `README.md` with modern quick links and cross-references to the standalone Android repository.
+- Android source remains at **0.5.6 / versionCode 27** (unchanged code, updated documentation). Verified binary baseline preserved at `0.3.0 / code 5`.
+- Combined ESP32 target firmware contract remains **2.0.2-wled-room**; physical COM5 hardware remains protected and untouched.
+
+Earlier deliveries are retained below.
+
 # SmartRoom Controller — Version 30 (V30)
 
 Current project delivery, 25 October 2026 (Asia/Calcutta). Previous delivery: V29.
