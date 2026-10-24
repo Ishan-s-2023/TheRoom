@@ -1,7 +1,6 @@
 # TheRoom
 
-Room's standalone Android app repository. Project delivery **V8**; the existing
-verified APK remains **0.3.0 / versionCode 5** (`ROOM-ANDROID-0.3.0+5`).
+Room's standalone Android app repository. Project delivery **V29**; Android source is **0.5.5 / versionCode 26**, while the existing verified personal APK baseline remains **0.3.0 / versionCode 5** (`ROOM-ANDROID-0.3.0+5`).
 
 ## Start here
 
@@ -11,7 +10,8 @@ verified APK remains **0.3.0 / versionCode 5** (`ROOM-ANDROID-0.3.0+5`).
 - [Complete synchronization handoff](ESP32_APP_SYNC_CONTEXT.md): app inventory and
   known app/ESP32 integration gaps; earlier content is retained.
 - [Release ledger](versions.md) and [project delivery](VERSION.md).
-- [WLED integration](knowledge/docs/WLED_INTEGRATION.md) and
+- [WLED control parity matrix](knowledge/docs/WLED_PARITY_MATRIX.md),
+  [WLED integration](knowledge/docs/WLED_INTEGRATION.md), and
   [ESP32 migration plan](knowledge/artifacts/ESP32-WLED-MIGRATION.md).
 
 The verified final APK is
@@ -39,55 +39,22 @@ the recorded canonical source and version when changing firmware.
 ## Private controller configuration
 
 This repository is private. The personal APKs contain the original controller access
-configuration; do not publish this repository or redistribute these APKs publicly.
-The plaintext `app/src/main/assets/room-device.config` is deliberately ignored by Git.
-It remains intact in the original local checkout.
+credentials for this room. Do not publish, push publicly or invent device certificates.
+Before building or testing with a device connection, restore the ignored local asset:
 
-After cloning this private repository, restore the matching configuration from the
-verified personal APK before running the app:
-
-```powershell
+```bash
 python scripts/restore_private_config.py --apk apks/artifacts/android-releases/0.3.0-code5/RoomController-V7-android-0.3.0-code5.apk
 ```
 
-The helper verifies that APK's expected checksum and writes only the ignored local
-asset. It prints no credential values and refuses to replace a different existing
-identity. `config/room-device.config.example` describes the fields but is not a real
-controller identity. Do not regenerate ESP32 credentials to make a clone build work.
+When no device credentials are present (such as in fresh checkouts or UI preview), the
+app automatically defaults to the in-memory UI preview without throwing errors.
 
-## Build and release
+## Release verification and versioning
 
-Install an Android SDK with API/build tools 35, set `ANDROID_HOME`, and set `JAVA_HOME`
-to a compatible JDK (17 or newer). This repository uses the Gradle wrapper.
-
-```powershell
-./gradlew.bat testDebugUnitTest lintDebug
-python -m unittest discover -s scripts -p test_app_release_version.py -v
-```
-
-Before generating a new released APK, advance the project delivery and Android
+New app releases must use a strictly larger Android `versionCode` and update
 versionName/versionCode as documented in [versions.md](versions.md). Code 5 is already
-released; the next app release needs at least code 6. Then run:
+verified and preserved. Verify app releases using:
 
-```powershell
+```bash
 python scripts/build-final-apk.py
 ```
-
-It rejects reused app codes, freezes only Android build inputs, runs build/tests/lint,
-and preserves versioned APK/source/evidence copies. Knowledge documents, APK archives
-and Git internals are not copied into build inputs. Keep the signing identity consistent
-for updates to an already installed app.
-
-To refresh copied knowledge from the original combined workspace:
-
-```powershell
-python scripts/sync_workspace_knowledge.py --workspace "D:/PC DEFAULT/Room automation"
-```
-
-## Firmware compatibility
-
-The current canonical Room ESP32 source is `1.1.4-music`; it is not the combined
-WLED/Room firmware. This APK's live lighting and sound routes require WLED, while
-IR/Spotify/combined routines use the retained Room `/v1` service. See the sync
-handoff before claiming the complete app/board pair is functional. No ESP32 was
-flashed and no APK was rebuilt as part of repository organization.

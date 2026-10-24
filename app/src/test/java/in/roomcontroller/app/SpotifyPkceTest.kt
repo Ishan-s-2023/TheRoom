@@ -30,10 +30,19 @@ class SpotifyPkceTest {
         val verifier = SpotifyPkce.random()
         assertTrue(verifier.length in 43..128)
         assertNotEquals(verifier, SpotifyPkce.random())
-        val url = SpotifyPkce.authorization(verifier, "state")
+        val url = SpotifyPkce.authorization(verifier, "state", "test_client_id_pkce")
+        assertTrue(url.contains("client_id=test_client_id_pkce"))
         assertTrue(url.contains("code_challenge_method=S256"))
         assertTrue(url.contains("redirect_uri=in.roomcontroller.app%3A%2F%2Fspotify%2Fcallback"))
         assertFalse(url.contains("client_secret"))
         assertFalse(url.contains(verifier))
+    }
+    @Test fun authorizationRejectsBlankClientId() {
+        assertThrows(IllegalArgumentException::class.java) {
+            SpotifyPkce.authorization("verifier", "state", "")
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            SpotifyPkce.authorization("verifier", "state", "   ")
+        }
     }
 }

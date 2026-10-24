@@ -1,7 +1,7 @@
 # TheRoom app repository
 
 This is the standalone Android checkout. Use `app/`, not a nested `android/app/`.
-Current project organization delivery: **V8**. Existing APK: **0.3.0 / code 5**.
+Current project organization delivery: **V16** (Android source **0.4.2 / code 13**). Existing archived baseline APK: **0.3.0 / code 5**.
 
 - Preserve `apks/` release bytes and hashes. Historical/debug APKs are not interchangeable
   with the verified final APK merely because their version names match.

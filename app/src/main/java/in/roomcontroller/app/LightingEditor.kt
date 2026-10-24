@@ -17,28 +17,59 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import org.json.JSONObject
+import kotlin.math.roundToInt
 
-@Composable fun LightingEditor(value:JSONObject,onChange:(JSONObject)->Unit) {
-    val automatic=value.optString("effect","solid")!="solid"
-    var lastReactive by remember {mutableStateOf(if(automatic)value.optString("effect") else "beat")}
-    Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-        SectionLabelInline("Room lighting")
-        LiquidToggle(value.optBoolean("power"),{onChange(value.copyJson().put("power",it))},label="Lighting power")
+@Composable fun LightingEditor(value: JSONObject, onChange: (JSONObject) -> Unit) {
+    val automatic = value.optString("effect", "solid") != "solid"
+    var lastReactive by remember { mutableStateOf(if (automatic) value.optString("effect") else "beat") }
+    val power = value.optBoolean("power", true)
+    val color = value.optString("color", "#FF8800")
+    val brightness = value.optInt("brightness", 65).toFloat()
+    val speed = value.optInt("speed", 50).toFloat()
+    val intensity = value.optInt("intensity", 60).toFloat()
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            SectionLabelInline("Room lighting")
+            LiquidToggle(power, { onChange(value.copyJson().apply { put("power", it) }) }, label = "Lighting power")
+        }
+
+        LedWheelColorPicker(
+            color = if (power) color else "#000000",
+            brightness = if (power) brightness else 0f,
+            isEffectMode = automatic,
+            onColorChange = { hex ->
+                onChange(value.copyJson().apply { put("color", hex); put("effect", "solid"); put("power", true) })
+            },
+            onBrightnessChange = { b ->
+                val intB = b.roundToInt()
+                onChange(value.copyJson().apply { put("brightness", intB); put("power", intB > 0) })
+            },
+            onEffectModeChange = { isFx ->
+                onChange(value.copyJson().apply { put("effect", if (isFx) lastReactive else "solid"); put("power", true) })
+            },
+            onRainbowSelected = {
+                lastReactive = "bands"
+                onChange(value.copyJson().apply { put("effect", "bands"); put("power", true) })
+            },
+            onPowerOff = {
+                onChange(value.copyJson().apply { put("power", false) })
+            },
+            enabled = true
+        )
+
+        if (automatic) {
+            RoomCard(Modifier.fillMaxWidth()) {
+                SectionLabel("Music reactive effects")
+                Choices(listOf("beat", "bass", "level", "bands"), value.optString("effect")) {
+                    lastReactive = it
+                    onChange(value.copyJson().put("effect", it).put("power", true))
+                }
+                SettingSlider("Response speed", speed, { onChange(value.copyJson().put("speed", it.toInt())) })
+                SettingSlider("Effect intensity", intensity, { onChange(value.copyJson().put("intensity", it.toInt())) })
+            }
+        }
     }
-    Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {Text("Move with music",fontSize=15.sp);Text("Automatic room-microphone response",color=Muted,fontSize=11.sp)}
-        LiquidToggle(automatic,{onChange(value.copyJson().put("effect",if(it)lastReactive else "solid"))},label="Move with music")
-    }
-    if(automatic) {
-        Choices(listOf("beat","bass","level","bands"),value.optString("effect")) {lastReactive=it;onChange(value.copyJson().put("effect",it))}
-        Text("Music controls the colour. Turn off Move with music to choose a manual colour.",color=Muted,fontSize=12.sp,lineHeight=19.sp)
-        SettingSlider("Response speed",value.optInt("speed",50).toFloat(),{onChange(value.copyJson().put("speed",it.toInt()))})
-        SettingSlider("Effect intensity",value.optInt("intensity",60).toFloat(),{onChange(value.copyJson().put("intensity",it.toInt()))})
-    } else {
-        SmallLabel("CHOOSE YOUR COLOUR")
-        CromiaColorPicker(value.optString("color","#B5F36A"),{onChange(value.copyJson().put("color",it))})
-    }
-    BrightnessControl(value.optInt("brightness",65).toFloat(),{onChange(value.copyJson().put("brightness",it.toInt()))})
 }
 
 @Composable fun PresetEditor(existing:JSONObject?,current:JSONObject,dismiss:()->Unit,save:(String,JSONObject)->Unit) {

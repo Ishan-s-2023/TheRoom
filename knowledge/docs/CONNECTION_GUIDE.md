@@ -49,7 +49,7 @@ Complete direct ESP32 pairing and home Wi-Fi setup first. You need internet on t
 
 ### 2. Register the Android callback
 
-For Connect Spotify on this phone, the current APK uses Client ID 564aae7414ea4cb58d45c479f6f9f795. Its Spotify app owner must register exactly in.roomcontroller.app://spotify/callback in that application dashboard and authorize your Spotify user in Development Mode. If you use your own different developer application, use the computer helper below or rebuild the APK with that Client ID. The callback belongs to the Android app, not to the ESP32 HTTPS address. No Client Secret is needed.
+For Connect Spotify on this phone, enter your own Spotify Developer Application Client ID in Settings → Connections. Its Spotify app owner must register exactly in.roomcontroller.app://spotify/callback in that application dashboard and authorize your Spotify user in Development Mode. The callback belongs to the Android app, not to the ESP32 HTTPS address. No Client Secret is needed.
 
 ### 3. Connect from the main Music tab
 

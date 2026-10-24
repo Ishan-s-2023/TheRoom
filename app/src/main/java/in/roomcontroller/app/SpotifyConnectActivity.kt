@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.URL
@@ -59,18 +61,36 @@ class SpotifyConnectActivity : ComponentActivity() {
     }
     private fun begin() {
         runCatching {
-            val pairing = TokenVault(this, "room-device-pairing").read()
-            DevicePairing.parse(pairing)
+            val pairing = runCatching { TokenVault(this, "room-device-pairing").read() }.getOrDefault("")
             val origin = getSharedPreferences("room-settings", Context.MODE_PRIVATE).getString("endpoint", "").orEmpty()
-            require(origin.startsWith("https://")) { "Connect to your paired ESP32 first" }
+            val storedClientId = intent.getStringExtra("client_id")
+                ?.takeIf { it.isNotBlank() }
+                ?: runBlocking { RoomDataStore(this@SpotifyConnectActivity).settingsFlow.first().spotifyClientId }
+                    .takeIf { it.isNotBlank() }
+                ?: SpotifyPkce.CLIENT_ID
+            require(storedClientId.isNotBlank()) {
+                "Spotify Client ID is not configured. Enter your Spotify Developer Client ID in Settings first."
+            }
             val verifier = SpotifyPkce.random()
             val state = SpotifyPkce.random()
-            pending.save(obj("verifier" to verifier, "state" to state, "expires" to System.currentTimeMillis()+600_000,
-                "origin" to origin, "pairing" to pairing).toString())
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SpotifyPkce.authorization(verifier, state))).addCategory(Intent.CATEGORY_BROWSABLE))
-            message = "Approve access in Spotify to return to Room automatically. Keep this phone on your room's Wi-Fi with internet access."
+            pending.save(
+                obj(
+                    "verifier" to verifier,
+                    "state" to state,
+                    "client_id" to storedClientId,
+                    "expires" to System.currentTimeMillis() + 600_000,
+                    "origin" to origin,
+                    "pairing" to pairing
+                ).toString()
+            )
+            startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse(SpotifyPkce.authorization(verifier, state, storedClientId)))
+                    .addCategory(Intent.CATEGORY_BROWSABLE)
+            )
+            message = "Approve access in Spotify to return to Room automatically. Keep this phone connected to the internet."
         }.onFailure { pending.clear(); message = it.message ?: "Could not open Spotify sign-in" }
     }
+
     private fun complete(url: String) {
         running = true
         lifecycleScope.launch {
@@ -79,20 +99,45 @@ class SpotifyConnectActivity : ComponentActivity() {
                 val code = SpotifyPkce.callback(url, attempt.getString("state"), attempt.getLong("expires"))
                 // Consume once before exchange. A replay cannot reuse the verifier.
                 pending.clear()
-                val pairingText = attempt.getString("pairing")
-                require(TokenVault(this@SpotifyConnectActivity, "room-device-pairing").read() == pairingText) { "Room pairing changed. Connect Spotify again." }
-                message = "Connecting Spotify to your paired room…"
-                val refresh = exchange(code, attempt.getString("verifier"))
-                require(TokenVault(this@SpotifyConnectActivity, "room-device-pairing").read() == pairingText) { "Room pairing changed. Connect Spotify again." }
-                DeviceTransport(this@SpotifyConnectActivity, DevicePairing.parse(pairingText)).call(attempt.getString("origin"), "/v1/command",
-                    obj("op" to "spotify_credentials", "client_id" to SpotifyPkce.CLIENT_ID, "refresh_token" to refresh))
+                val clientId = attempt.optString("client_id", "").ifBlank {
+                    runBlocking { RoomDataStore(this@SpotifyConnectActivity).settingsFlow.first().spotifyClientId }
+                }.ifBlank { SpotifyPkce.CLIENT_ID }
+                require(clientId.isNotBlank()) { "Spotify Client ID is not configured." }
+                message = "Exchanging Spotify OAuth code and storing encrypted tokens in DataStore…"
+                val tokenResponse = exchangeTokens(code, attempt.getString("verifier"), clientId)
+                val accessToken = tokenResponse.optString("access_token")
+                val refreshToken = tokenResponse.optString("refresh_token")
+                val expiresIn = tokenResponse.optLong("expires_in", 3600L)
+                RoomDataStore(this@SpotifyConnectActivity).saveSpotifyOAuthTokens(
+                    accountName = "Spotify OAuth PKCE",
+                    clientId = clientId,
+                    accessToken = accessToken,
+                    refreshToken = refreshToken,
+                    expiresInSec = expiresIn
+                )
+                val pairingText = attempt.optString("pairing")
+                val origin = attempt.optString("origin")
+                if (pairingText.isNotBlank() && (origin.startsWith("https://") || origin.startsWith("http://"))) {
+                    runCatching {
+                        require(TokenVault(this@SpotifyConnectActivity, "room-device-pairing").read() == pairingText) {
+                            "Room pairing changed. Connect Spotify again."
+                        }
+                        val parsedPairing = DevicePairing.parseFlexible(pairingText)
+                        DeviceTransport(this@SpotifyConnectActivity, parsedPairing).call(
+                            origin,
+                            "/v1/command",
+                            obj("op" to "spotify_credentials", "client_id" to clientId, "refresh_token" to refreshToken)
+                        )
+                    }
+                }
                 message = "Spotify connected. Return to Music and refresh playback. Open Spotify on your preferred playback device and play a track to make it available."
             } catch (e: Exception) {
                 message = (e.message?.takeIf { it.isNotBlank() } ?: "Spotify connection failed") + " Return to Room and connect again."
             } finally { running = false }
         }
     }
-    private suspend fun exchange(code: String, verifier: String): String = withContext(Dispatchers.IO) {
+
+    private suspend fun exchangeTokens(code: String, verifier: String, clientId: String): JSONObject = withContext(Dispatchers.IO) {
         val connection = URL("https://accounts.spotify.com/api/token").openConnection() as HttpsURLConnection
         try {
             connection.requestMethod = "POST"
@@ -100,12 +145,21 @@ class SpotifyConnectActivity : ComponentActivity() {
             connection.connectTimeout = 15_000; connection.readTimeout = 15_000
             connection.doOutput = true
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-            val body = SpotifyPkce.form(mapOf("grant_type" to "authorization_code", "code" to code,
-                "redirect_uri" to SpotifyPkce.REDIRECT, "client_id" to SpotifyPkce.CLIENT_ID, "code_verifier" to verifier))
+            val body = SpotifyPkce.form(
+                mapOf(
+                    "grant_type" to "authorization_code",
+                    "code" to code,
+                    "redirect_uri" to SpotifyPkce.REDIRECT,
+                    "client_id" to clientId,
+                    "code_verifier" to verifier
+                )
+            )
             connection.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
             require(connection.responseCode == 200) { "Spotify rejected authorization. Check the registered app redirect URI and account access." }
             val token = connection.inputStream.use { JSONObject(it.readBounded(32_768)) }
-            token.optString("refresh_token").also { require(it.length in 20..2048) { "Spotify did not return refresh credentials" } }
+            val refresh = token.optString("refresh_token")
+            require(refresh.length in 20..2048) { "Spotify did not return refresh credentials" }
+            token
         } finally { connection.disconnect() }
     }
 }

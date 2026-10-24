@@ -8,20 +8,23 @@ import java.security.SecureRandom
 import java.util.Base64
 
 internal object SpotifyPkce {
-    const val CLIENT_ID = "564aae7414ea4cb58d45c479f6f9f795"
+    const val CLIENT_ID = ""
     const val REDIRECT = "in.roomcontroller.app://spotify/callback"
-    private const val SCOPES = "user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative user-read-recently-played"
+    private const val SCOPES = "user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative user-read-recently-played user-library-read user-library-modify"
     fun random(): String = Base64.getUrlEncoder().withoutPadding().encodeToString(ByteArray(48).also { SecureRandom().nextBytes(it) })
     fun challenge(verifier: String): String = Base64.getUrlEncoder().withoutPadding()
         .encodeToString(MessageDigest.getInstance("SHA-256").digest(verifier.toByteArray(Charsets.US_ASCII)))
     fun form(values: Map<String, String>): String = values.entries.joinToString("&") {
         URLEncoder.encode(it.key, "UTF-8") + "=" + URLEncoder.encode(it.value, "UTF-8")
     }
-    fun authorization(verifier: String, state: String) = "https://accounts.spotify.com/authorize?" + form(mapOf(
-        "client_id" to CLIENT_ID, "response_type" to "code", "redirect_uri" to REDIRECT,
-        "state" to state, "code_challenge_method" to "S256", "code_challenge" to challenge(verifier),
-        "scope" to SCOPES, "show_dialog" to "true"
-    ))
+    fun authorization(verifier: String, state: String, clientId: String = CLIENT_ID): String {
+        require(clientId.isNotBlank()) { "Spotify Client ID is not configured. Enter your Spotify Developer Client ID in Settings before connecting." }
+        return "https://accounts.spotify.com/authorize?" + form(mapOf(
+            "client_id" to clientId, "response_type" to "code", "redirect_uri" to REDIRECT,
+            "state" to state, "code_challenge_method" to "S256", "code_challenge" to challenge(verifier),
+            "scope" to SCOPES, "show_dialog" to "true"
+        ))
+    }
     fun callback(url: String, expectedState: String, expires: Long, now: Long = System.currentTimeMillis()): String {
         val uri = URI(url)
         val target = URI(REDIRECT)

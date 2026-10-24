@@ -1,7 +1,6 @@
 # Spotify connection from Room on Android
 
-In Spotify Developer Dashboard, open the app with Client ID
-`564aae7414ea4cb58d45c479f6f9f795`, add this exact Redirect URI, and save:
+In Spotify Developer Dashboard, open your application (or create one), enter its Client ID into the Room app under Settings → Connections, add this exact Redirect URI to your Spotify app settings, and save:
 
 ```text
 in.roomcontroller.app://spotify/callback

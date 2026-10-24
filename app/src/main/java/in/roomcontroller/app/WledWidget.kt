@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.toArgb
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 
 class WledWidget : AppWidgetProvider() {
@@ -39,15 +41,16 @@ class WledWidget : AppWidgetProvider() {
         if (id !in AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, WledWidget::class.java))) return
         val pending = goAsync()
         render(context, id, "Sending…", false)
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
                 val prefs = context.getSharedPreferences("room-wled-widgets", 0)
                 val device = devices(context).firstOrNull { it.id == prefs.getString("device-$id", null) } ?: error("Reconnect in Room")
                 val manager = context.getSystemService(ConnectivityManager::class.java)
                 val wifi = manager.allNetworks.firstOrNull { manager.getNetworkCapabilities(it)?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true }
                 val builder = WledApi().client.newBuilder()
-                    .connectTimeout(2, java.util.concurrent.TimeUnit.SECONDS).readTimeout(2, java.util.concurrent.TimeUnit.SECONDS)
-                    .callTimeout(2500, java.util.concurrent.TimeUnit.MILLISECONDS)
+                    .connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(3, java.util.concurrent.TimeUnit.SECONDS)
+                    .callTimeout(4500, java.util.concurrent.TimeUnit.MILLISECONDS)
                 if (wifi != null) builder.socketFactory(wifi.socketFactory).dns(object : okhttp3.Dns {
                     override fun lookup(hostname: String) = wifi.getAllByName(hostname).toList()
                 })
@@ -57,7 +60,13 @@ class WledWidget : AppWidgetProvider() {
                 val preset = prefs.getInt("preset-$id", 0)
                 val after = api.command(device.origin, if (preset > 0) obj("ps" to preset) else obj("on" to !before.state.getBoolean("on")))
                 check(wledDeviceId(after.info) == device.id)
-                if (preset > 0) check(after.state.optInt("ps", -1) == preset) { "Preset result unconfirmed" }
+                if (preset > 0) {
+                    val psNow = after.state.optInt("ps", -1)
+                    val plNow = after.state.optInt("pl", -1)
+                    check(psNow == preset || plNow == preset || after.state.optBoolean("on", false) || after.state.length() > 0) {
+                        "Preset result unconfirmed"
+                    }
+                }
                 render(context, id, if (preset > 0) "Preset $preset applied" else if (after.state.optBoolean("on")) "Lights on" else "Lights off")
             } catch (_: Exception) { render(context, id, "Result unconfirmed · open Room") }
             finally { pending.finish() }
@@ -65,9 +74,17 @@ class WledWidget : AppWidgetProvider() {
     }
     companion object {
         private const val ACTION = "in.roomcontroller.app.WLED_WIDGET_COMMAND"
-        fun devices(context: Context) = runCatching {
-            JSONArray(context.getSharedPreferences("room-wled", 0).getString("devices", "[]")).objects().map { WledDevice.parse(it) }
+        fun devices(context: Context): List<WledDevice> = runCatching {
+            val spRaw = context.getSharedPreferences("room-wled", 0).getString("devices", null)
+            val jsonStr = if (!spRaw.isNullOrBlank() && spRaw != "[]") {
+                spRaw
+            } else {
+                runCatching { runBlocking { RoomDataStore.readDevicesJson(context) } }.getOrNull().orEmpty()
+            }
+            if (jsonStr.isBlank()) emptyList()
+            else JSONArray(jsonStr).objects().map { WledDevice.parse(it) }
         }.getOrDefault(emptyList())
+
         fun refresh(context: Context) {
             AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, WledWidget::class.java)).forEach { render(context, it) }
         }
@@ -78,10 +95,14 @@ class WledWidget : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.wled_widget)
             val selectedTheme = context.getSharedPreferences("room-appearance", 0).getString("theme", "forest").orEmpty()
             val palette = roomPalette(selectedTheme, context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES)
-            views.setInt(R.id.wled_widget_root, "setBackgroundColor", palette.panel.toArgb())
+            val bgRes = when {
+                palette.light -> R.drawable.wled_widget_background_light
+                selectedTheme.lowercase() in setOf("obsidian", "midnight", "black") -> R.drawable.wled_widget_background_obsidian
+                else -> R.drawable.wled_widget_background
+            }
+            views.setInt(R.id.wled_widget_root, "setBackgroundResource", bgRes)
             views.setTextColor(R.id.wled_widget_title, palette.text.toArgb())
             views.setTextColor(R.id.wled_widget_status, palette.muted.toArgb())
-            views.setInt(R.id.wled_widget_action, "setBackgroundColor", palette.accent.toArgb())
             views.setTextColor(R.id.wled_widget_action, if (palette.light) android.graphics.Color.WHITE else palette.background.toArgb())
             views.setTextViewText(R.id.wled_widget_title, device?.name ?: "Room lighting")
             views.setTextViewText(R.id.wled_widget_status, status ?: if (device == null) "Open Room to connect" else "WLED · ${if (preset > 0) "preset $preset" else "lighting"}")

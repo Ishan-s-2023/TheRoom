@@ -8266,3 +8266,853 @@ firmware/source files are moved or made part of the app Git root.
 The original document bytes preceding this addendum are retained. Git publication
 status/commit and the copy manifests are recorded separately in the V8 repository
 verification report; this addendum alone is not proof that a push succeeded.
+
+
+## 12. V9 AI Studio preview resilience and Android 0.3.1 (code 6)
+
+Recorded 21 October 2026, Asia/Calcutta. Project delivery **V9**.
+
+- **Android source version:** `0.3.1`, `versionCode = 6` in `app/build.gradle.kts`.
+- **Change summary:**
+  - `RoomModel` now loads `assets/room-device.config` via `runCatching` instead of crashing with `FileNotFoundException` when the gitignored private asset is absent (such as in the AI Studio Streaming Emulator or a fresh clone before running `scripts/restore_private_config.py`).
+  - No board identity is invented or regenerated when `room-device.config` is missing (`configuredDevice` remains `null`).
+  - When no saved session token, pairing, or `configuredDevice` is present at startup, `RoomModel` automatically initializes the built-in in-memory UI preview (`demo()`) so the full Room interface renders immediately in the preview emulator.
+  - `useBuiltInDevice()` and `exitPreview()` guard against a missing `configuredDevice` and allow returning cleanly to `PairDeviceScreen` via `logout()`.
+  - `app/build.gradle.kts` adds the AI Studio `debugConfig` signing configuration when `${rootDir}/debug.keystore` is present.
+- **Preserved baselines:**
+  - Verified personal APK `ROOM-ANDROID-0.3.0+5` (`917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4`) is preserved unchanged.
+  - Canonical ESP32 firmware source remains `1.1.4-music`. No ESP32 was flashed or queried, no OTA monotonic counter was changed, and no WLED features are claimed on Room-only firmware.
+
+
+## 13. V10 LED light control color wheel without black and Android 0.3.2 (code 7)
+
+Recorded 21 October 2026, Asia/Calcutta. Project delivery **V10**.
+
+- **Android source version:** `0.3.2`, `versionCode = 7` in `app/build.gradle.kts`.
+- **Change summary:**
+  - Replaced the rectangular gradient picker containing muddy black shades with `LedWheelColorPicker` — an LED-hardware-accurate circular Hue-Saturation disc where the center is pure white and the perimeter consists of pure saturated hues (no black is present on the wheel itself, accurately reflecting physical addressable LED emission).
+  - Added dedicated gradient sliders: Brightness slider (dim-to-bright track with white thumb) and Saturation/White slider (warm-white to pure hue track with white thumb).
+  - Added two rows of quick color swatches: Red, Orange, Amber, Warm White, Pure White, Black/Off (for turning the strip off), Magenta, Blue, Cyan, Lime Green, and a Rainbow gradient swatch ("R" icon) for dynamic cycling.
+  - Added circular `Fx` (Music Reactive Effects) and `Bg` (Solid Color) mode buttons. In `Fx` mode, dynamic effects ("Beat", "Bass", "Level", "Bands") with response speed and effect intensity controls are presented.
+  - Integrated into `LightingEditor` and `PresetEditor`.
+- **Preserved baselines:**
+  - Verified personal APK `ROOM-ANDROID-0.3.0+5` (`917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4`) remains preserved.
+  - Canonical ESP32 firmware source remains `1.1.4-music`. No board flash, query, or OTA monotonic counter change performed.
+
+
+## 14. V11 Spotify track artwork and album photo rendering and Android 0.3.3 (code 8)
+
+Recorded 21 October 2026, Asia/Calcutta. Project delivery **V11**.
+
+- **Android source version:** `0.3.3`, `versionCode = 8` in `app/build.gradle.kts`.
+- **Change summary:**
+  - Added `io.coil-kt:coil-compose:2.7.0` for asynchronous image loading across Compose surfaces.
+  - Added robust Spotify track image URL extraction (`extractTrackImage`) inspecting direct URLs (`image_url`, `artwork_url`, `artwork`), nested track album images (`track.album.images`), and player item album images (`player.item.album.images`).
+  - Updated `MusicPlayerWidget` to display the actual high-resolution album/track artwork in a rounded 22.dp card with gradient depth overlay and interactive tap-to-zoom (190.dp / 230.dp), retaining the rotating vinyl canvas as an automatic fallback when no image URL is provided.
+  - Updated `DeviceMusicScreen` to display the active track's cover photo in a 68.dp rounded thumbnail container alongside track title, artist, and device.
+  - Updated search and browse results in both `MusicScreen` and `DeviceMusicScreen` to render track and playlist thumbnails alongside item names.
+  - Updated `PreviewData` fixtures so that preview playback ("Evening Signals", "Morning Light", "Selected preview track", and preview playlists) includes realistic album artwork photos out of the box in the preview emulator.
+- **Preserved baselines:**
+  - Verified personal APK `ROOM-ANDROID-0.3.0+5` (`917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4`) remains preserved.
+  - Canonical ESP32 firmware source remains `1.1.4-music`. No board flash, query, or OTA monotonic counter change performed.
+
+
+## 15. V12 Routines menu redesign, live execution, and customization expansion (code 9)
+
+Recorded 21 October 2026, Asia/Calcutta. Project delivery **V12**.
+
+- **Android source version:** `0.3.4`, `versionCode = 9` in `app/build.gradle.kts`.
+- **Change summary:**
+  - Redesigned `RoutinesScreen` and `RuleDialog` into a comprehensive, fully functional automation system.
+  - Implemented `executeRoutine` allowing any routine to be executed immediately ("Run now" button on routine cards) with live feedback and state refresh for lighting, IR appliances, and Spotify playback.
+  - Added live "Test this action right now" testing inside the routine editor dialog so actions can be previewed physically or in simulation before saving.
+  - Added a horizontal 1-tap quick-start templates carousel featuring Morning Wakeup, Evening Wind-Down, Music Bass Sync, and Bedtime All Off.
+  - Expanded customization options:
+    - Lighting: Power toggle, 8 quick color swatches (Warm White, Daylight, Sunset Amber, Neon Lime, Ocean Cyan, Violet, Rose, Crimson), 1-100% brightness slider, reactive lighting effects (Solid, Bass, Beat, Level, Bands), speed & intensity sliders, or saved presets.
+    - Infrared: Appliance selector and command selector.
+    - Spotify: Play/resume, pause, playlist selection, and volume preset.
+    - Compound: Combined lighting adjustments and IR remote signals in one routine.
+    - Triggers: Schedule with time chips and weekday presets (Daily, Weekdays, Weekends), sound started (microphone noise/music detection), sound stopped (room quiet), IR remote signal received, and one-tap manual rituals.
+  - Added an automation master status card displaying active routines count, controller timezone, and Arm/Pause automation controls.
+- **Preserved baselines:**
+  - Verified personal APK `ROOM-ANDROID-0.3.0+5` (`917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4`) remains preserved.
+  - Canonical ESP32 firmware source remains `1.1.4-music`. No board flash, query, or OTA monotonic counter change performed.
+
+
+## 16. V13 Paused automation visual and interaction disabling and Settings instructions removal (code 10)
+Recorded 21 October 2026, Asia/Calcutta. Project delivery **V13**.
+- **Android source version:** `0.3.5`, `versionCode = 10` in `app/build.gradle.kts`.
+- **Change summary:**
+  - In `AutomationScreens.kt`, when automations are paused (`!isArmed`):
+    - All routine cards are visually grayed out (`Modifier.alpha(0.45f)`), and the card border, icons, and texts reflect the inactive paused state.
+    - An informative paused callout banner is displayed under the master status card informing the user that automations, schedules, and reactions are paused until re-enabled.
+    - All click interactions on routine cards are disabled: the routine toggle (`LiquidToggle`), the "Run now" execution button (`FilledTonalButton`), the "Edit" button, and the "Delete" button are disabled (`enabled = isArmed && !ui.busy`).
+    - The "Create routine" action button is disabled when automations are paused.
+    - The quick-start templates carousel is dimmed (`Modifier.alpha(0.45f)`) and click interactions are disabled.
+    - Each routine card prominently displays a "PAUSED" status badge when automations are inactive.
+  - In `ServiceScreens.kt` and `MainActivity.kt`:
+    - Removed the redundant connection instructions card (`ConnectionGuides`) from the lower section of Settings across direct ESP32 mode and service connection mode, keeping Settings focused on essential Wi-Fi credentials, clock/timezone preferences, backup/restore, firmware updates, and diagnostics.
+    - Updated `MoreSettingsScreen` card description to "Appearance, controller preferences & diagnostics".
+- **Preserved baselines:**
+  - Verified personal APK `ROOM-ANDROID-0.3.0+5` (`917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4`) remains preserved.
+  - Canonical ESP32 firmware source remains `1.1.4-music`. No board flash, query, or OTA monotonic counter change performed.
+
+
+## 17. V14 Native In-App WLED Integration, Portal Removal & HTTPS Framing Repair (code 11)
+Recorded 21 October 2026, Asia/Calcutta. Project delivery **V14**.
+- **Android source version:** `0.4.0`, `versionCode = 11` in `app/build.gradle.kts`.
+- **Target firmware contract:** Combined `2.0.1-wled-room` (`WLED 16.0.1` + `RoomBridgeUsermod` + `AudioReactive`) alongside legacy `1.1.4-music` compatibility.
+- **Change summary:**
+  - **Exhaustive Parity Inventory:** Created `knowledge/docs/WLED_PARITY_MATRIX.md` and `artifacts/WLED_PARITY_INVENTORY.md` mapping every WLED `/json/si`, `/json/state`, `/json/eff`, `/json/pal`, `/json/fxdata`, `/presets.json`, `/json/cfg`, `/ws` and Room `/v1/state`, `/v1/command`, `/v1/jobs`, `/v1/ota` control to its native Jetpack Compose component.
+  - **Portal & WebView Removal:** Deleted `WledBrowser.kt` and `WledTheme.kt` and removed `androidx.webkit:webkit` from `app/build.gradle.kts`. Zero `WebView`, `CustomTabsIntent`, or browser portal redirects remain in `app/src/main`.
+  - **Native Lighting Workspace (`WledScreens.kt`, `WledProtocol.kt`, `WledModel.kt`):** Implemented the 5-tab native lighting workspace (`Colour`, `Effects`, `Segments`, `Presets`, `Controllers`) covering master power, brightness (`0..255`), transition time (`tt`), nightlight (`nl` enable, duration, target brightness, mode, remaining seconds), live override (`lor`), primary/secondary/tertiary segment colors (`col`), RGB/RGBW/CCT sliders, hex entry, dynamic `/json/fxdata` slider/checkbox/color/palette metadata rendering, isolated multi-segment editing (`seg` bounds, grouping, spacing, offset, reverse, mirror, freeze, power, brightness, add/delete/select), native `/presets.json` & playlist CRUD (`ps`, `psave`, `pdel`, `pl`), and live WebSocket LED strip preview (`{"lv":true}` binary `'L'` v1/v2 frames and JSON `leds` arrays with automatic `{"lv":false}` cleanup).
+  - **Native Sound Tuning (`SoundTuning.kt`, `WledConfig.kt`):** Implemented native WLED `AudioReactive` usermod settings (`/json/cfg` `um.AudioReactive`: enable, digital I2S mic type, INMP441 pins `BCLK 26`, `WS 25`, `SD 35` with reserved-GPIO conflict checks, squelch, gain, AGC, dynamics limiter/rise/fall, frequency scaling, UDP audio sync), Room `/v1/command` `set_microphone` quiet-response policy (`quiet_behavior`: `off`/`dim`/`hold`, `quiet_seconds`: `1..300`), and truthful `AudioReadinessState` banner (`HEALTHY_LOCAL`, `SILENT_ROOM`, `UDP_SYNC_ONLY`, `STALE_TELEMETRY`, `MIC_INIT_FAILED`, `MIC_DISABLED`, `OFFLINE`).
+  - **Native Controller Settings (`WledSettingsScreens.kt`, `WledConfig.kt`):** Added 5-section native `/json/cfg` configuration (**Wi-Fi & Setup AP**, **LEDs & Power Budget**, **Time & Timers**, **Sync & Interfaces**, **Pins & Backup/Restore**) using `deepMergeJson` and `stripUnchangedSecrets` so unknown keys and write-only passwords (`psk`, `pskl`) are preserved, plus `RoomHardwarePins` GPIO conflict validation and validated `presets.json`/`cfg.json` file export/import.
+  - **Room HTTPS Framing & Socket Pool Repair (`DeviceTransport.kt`, `BoundedInput.kt`):** Serialized requests per `DeviceTransport` with a `Mutex`, set `Connection: close`, and replaced raw unbounded stream reads with `readHttpBodyBytes` (`Content-Length`-aware bounded reading) so post-body TLS EOF without `close_notify` on ESP32 `esp_https_server` (`max_open_sockets = 2`) succeeds cleanly while truncated JSON deterministically throws `EOFException` without replaying POSTs.
+- **Preserved baselines:**
+  - Verified personal APK `ROOM-ANDROID-0.3.0+5` (`917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4`) remains untouched in `apks/` and `artifacts/android-release-history.json`.
+  - No ESP32 was flashed or queried, and no OTA NVS monotonic counter was changed.
+
+## 18. V15 WLED UI/UX Parity Polish, Persistent Selections & Presets, Luminous LED Peek, Universal Favorites & Centered Light Nav (code 12)
+Recorded 21 October 2026, Asia/Calcutta. Project delivery **V15**.
+- **Android source version:** `0.4.1`, `versionCode = 12` in `app/build.gradle.kts`.
+- **Target firmware contract:** Combined `2.0.1-wled-room` (`WLED 16.0.1` + `RoomBridgeUsermod` + `AudioReactive`) alongside legacy `1.1.4-music` compatibility.
+- **Change summary:**
+  - **Bottom Navigation Bar Order (`MainActivity.kt`):** Reordered the 5-item bottom navigation bar to `1. Home`, `2. Music`, `3. Light` (centered primary lighting hub), `4. Remote`, `5. More`, with lively spring scale animations on selection and press.
+  - **Persistent Selection & Tab State Across Navigation & Restarts (`MainActivity.kt`, `WledModel.kt`, `WledScreens.kt`, `WledSettingsScreens.kt`):** Persisted top-level screen (`ui_active_screen`), Light workspace sub-tab (`subTab`: `Colour`, `Effects`, `Segments`, `Presets`, `Controllers`), active color slot (`colorSlot`: `Primary`, `Secondary`, `Tertiary`), effect filter (`effectFilter`), selected segment ID (`selectedSegmentId`), WLED `/json/cfg` section (`configSection`), IR remote category (`ui_remote_cat`), and More sub-page (`ui_more_section`) in `SharedPreferences` (`wled_controllers` / `room_prefs`). Switching from `Effects` (`FX`) to `Remote` or closing/reopening the app restores the exact selected section.
+  - **ESP32 Preset & Lighting State Persistence (`WledModel.kt`, `WledScreens.kt`):** Saving a preset with current state ("OK" / `saveBounds = true`) now persists the preset to `/presets.json` (`psave`), activates the preset ID (`ps`) on the ESP32 controller, and caches the full snapshot in `SharedPreferences` (`last_snapshot_<id>`) so lighting state and active preset selection remain intact across app restarts and offline/preview sessions.
+  - **Luminous LED Strip Peek & True Hardware Color Rendering (`WledCatalogDefaults.kt`, `WledScreens.kt`):** Added `luminousLedColor`, `hsvToComposeColor`, and `computeStripPreviewPixels` using pure-Kotlin HSV gamma compensation (`baseV >= 0.28f`, `gamma = 0.42`) so the animated LED strip peek, palette preview bars, RGBW `ChannelLedSlider` tracks, and Kelvin CCT gradient slider render bright, vivid hardware-accurate colors without dark or muddy regions.
+  - **Compact Target Segment Selector (`WledScreens.kt`):** Redesigned `SegmentTargetSelectorCard` into a single-row header with a compact horizontal pill strip for segment targets, eliminating unnecessary blank vertical spacing.
+  - **Universal Favorites Pinning to Home With Automatic Jump (`RoomModels.kt`, `ControlScreens.kt`, `WledScreens.kt`):** Extended `RoomModel.toggleFavorite` to support starring any WLED Preset (`wled_preset`), WLED Playlist (`wled_playlist`), WLED Effect (`wled_effect`), WLED Palette (`wled_palette`), Quick Colour Swatch (`wled_color`), Room Scene (`preset`), or IR Command (`ir`). Tapping the favorite star on any item adds it to the Home screen's "Favorites Within Reach" grid and automatically navigates to `Home` so the newly pinned favorite is immediately within reach.
+  - **Lively Spring Animations (`DesignControls.kt`):** Added `Modifier.livelyClick` and `Modifier.livelyPressScale` across buttons, filter chips, segment pills, swatches, and cards.
+- **Preserved baselines:**
+  - Verified personal APK `ROOM-ANDROID-0.3.0+5` (`917a4bdba23b4f7c9e2b7042abb365e52204fbe8752b0b5d9a0407d2d2d076c4`) remains untouched in `apks/` and `artifacts/android-release-history.json`.
+  - No ESP32 was flashed or queried, and no OTA NVS monotonic counter was changed.
+
+
+---
+
+## 19. V16 Addendum — Jetpack DataStore Local Storage Layer & Home Preset Category Selector (Android 0.4.2 / versionCode 13)
+
+Recorded 21 October 2026 (Asia/Calcutta). Existing sections 1–18 above are preserved byte-for-byte.
+
+### 19.1 Scope of V16 Android Changes (`0.4.2` / `versionCode 13`)
+
+1. **Jetpack DataStore Local Storage Layer (`RoomDataStore.kt`, `WledModel.kt`, `RoomModel.kt`, `app/build.gradle.kts`)**:
+   - Added `androidx.datastore:datastore-preferences:1.1.1` and created `Context.roomDataStore` (`name = "room_user_state"`) wrapped by `RoomDataStore`.
+   - Persists and reactively observes:
+     - Selected `Light` control tab (`wled_active_tab`: `Colors`, `Effects`, `Palettes`, `Segments`, `Presets`, `Config`), `wled_pc_mode`, `wled_color_slot`, `wled_effect_filter`, and `wled_config_section`.
+     - Selected top-level page (`room_selected_page`).
+     - Selected Home preset category (`home_preset_category`) and custom preset category assignments (`preset_categories_json`).
+     - User-defined WLED state (`wled_saved_snapshot_json`, `wled_saved_presets_json`, `wled_saved_config_json`, `wled_devices_json`, `wled_selected_device`) and Room state (`room_persisted_state_json`), alongside all favorite sets.
+2. **Home Screen Preset Category Selector (`ControlScreens.kt`, `WledScreens.kt`, `RoomDataStore.kt`)**:
+   - Added `HomePresetCategorySection` to `HomeScreen` with category filter chips (`All`, `Favorites`, `Ambient`, `Vibrant & FX`, `Music & Sound`, `Focus & Work`, `Playlists`, `Room Scenes`).
+   - Added `PresetCategories` smart inference for WLED presets, playlists, and Room scenes plus user-customizable category assignment persisted in DataStore.
+   - Added category selection chips to the `Create / Save WLED Preset` card and category badges on saved presets in `WledPresetsAndPlaylistsTab`.
+
+---
+
+## 20. V17 Addendum — Animated Navigation Bar, Smooth Zero-Jitter Sliders, Uncluttered Home Redesign & Inbuilt ESP32 Native Music Pipeline in Lights (Android 0.4.3 / versionCode 14)
+
+Recorded 21 October 2026 (Asia/Calcutta). Existing sections 1–19 above are preserved byte-for-byte.
+
+### 20.1 Scope of V17 Android Changes (`0.4.3` / `versionCode 14`)
+
+1. **Navigation Bar Scale & Color Transition Animations (`MainActivity.kt`)**:
+   - Added `animateFloatAsState` (`iconScale` `1.0f..1.15f`, `labelScale` `1.0f..1.05f` with spring physics, combined with `Modifier.livelyPressScale`) and `animateColorAsState` (`iconColor`, `labelColor`, `indicatorBgColor`, `indicatorBorderColor` with `tween(240)`) to all 5 bottom navigation items (`Home`, `Music`, `Light`, `Remote`, `More`).
+2. **Smooth, Zero-Jitter Sliders (`DesignControls.kt`, `WledModel.kt`, `RoomModel.kt`, `MainActivity.kt`)**:
+   - Re-engineered `LedSlider`, `Slider05`, `BrightnessControl`, `VolumeControl`, `SettingSlider`, and `LedWheelColorPicker` to maintain immediate local finger-drag state (`dragFraction`), unified `awaitPointerEventScope` touch tracking without horizontal drag-slop delay, `IntOffset` placement-phase thumb positioning, 24 ms outbound callback throttling during drags, and a 220 ms post-release settle lock so asynchronous HTTP/WebSocket poll responses never snap the thumb backward.
+   - Moved heavy JSON/DataStore/widget serialization out of the per-pixel UI thread path into debounced coroutine blocks inside `WledModel.coalescedCommand` and `RoomModel.coalescedLighting`, `coalescedMicrophone`, and `coalescedVolume`.
+3. **Focused, Uncluttered Home Screen Redesign (`ControlScreens.kt`)**:
+   - Structured `HomeScreen` into 4 clean sections:
+     1. `HomeBrightnessAndVolumeHeroCard` (`home_primary_command_card`): Dual command deck for Light Brightness (`0–100%`) and Music Volume (`0–100%`) plus instant strip power toggle and music play/pause/skip controls.
+     2. `HomeColorCorrectingCard` (`home_color_correction_card`): Dedicated Color Correcting Studio with Chromatic Hue (`0°–360°`), Warm↔Cool White Balance (`2700K–6500K`), Color Saturation (`0–100%`), and 6 calibrated studio swatches (`2700K Warm`, `3500K Neutral`, `5000K Daylight`, `6500K Cool`, `Sunset Gold`, `Studio Mint`).
+     3. `HomeUniversalFavoritesSection` (`home_within_reach_section`): Capped at `MAX_HOME_FAVORITES = 4` items with overflow indicator and automatic prioritization of the most recently starred item (`lastFavoritedKey`).
+     4. `HomePresetCategorySection` (`home_preset_category_section`): Capped at `MAX_HOME_PRESETS = 4` items per category view with category filter chips and a quick link to the full Preset library.
+4. **Inbuilt Native ESP32 Music Response Pipeline in Lights (`WledScreens.kt`)**:
+   - Added `Esp32MusicPipelineQuickBanner` (`lights_music_pipeline_selector_banner`) and the `ESP32 Music` tab (`wled_tab_esp32_music` -> `Esp32NativeMusicPipelineTab`) in `WledLightsScreen` to expose the inbuilt custom ESP32 audio-reactive pipeline (`SmartRoomController` `1.1.4-music`: Core 0 `MusicAudioDSP` on INMP441 I²S `16 kHz / 512 samples`, BCLK 26 / WS 25 / DIN 35, 16-band FFT up to 8 kHz Nyquist, beat/bar/drop/flux latching + Core 1 `MusicLightingEngine` rendering `300 px @ 25 ms` on GPIO 23), distinct from WLED's AudioReactive effects.
+   - Displays live INMP441 RMS & 3 summary bands (`DSP #0 Bass`, `DSP #6 Mids`, `DSP #13 Treble`), mode cards for `beat`, `bass`, `bands`, `level`, and `solid`, smooth sliders for `speed` (pulse decay) and `intensity` (response depth), base color swatches, and INMP441 AGC/manual sensitivity, noise floor, temporal smoothing, quiet-room behavior (`dim` 6% solid + gamma, `off`, `hold`), quiet timeout (`1..300s`), and 5-second quiet calibration (`calibrate`).
+
+---
+
+## 21. V18 Addendum — Spotify Local Network Component, LiquidToggle & Slider05 Wave Slider, WS2812B Hardware Strip Visualizer, Segment Zone/Step Selectors, Fixed Card Layouts & 3-Band EQ in Settings (Android 0.4.4 / versionCode 15)
+
+Recorded 22 October 2026 (Asia/Calcutta). Existing sections 1–20 above are preserved byte-for-byte.
+
+### 21.1 Scope of V18 Android Changes (`0.4.4` / `versionCode 15`)
+
+1. **Spotify Local Network API Control Component (`DesignControls.kt`, `ControlScreens.kt`, `DeviceScreens.kt`, `ServiceScreens.kt`)**:
+   - Added `SpotifyLocalNetworkControlCard` (`spotify_local_network_card`) interfacing with the controller's local network Spotify API (`/v1/command` `op: "spotify"` for `play`, `pause`, `previous`, `next`, `volume`, `refresh` on direct ESP32 connections and `/spotify/playback` on companion connections) with track/artist/device status, transport controls, `LiquidToggle` power switch, and `Slider05` volume wave control.
+2. **`LiquidToggle` & `Slider05` Wave Slider (`DesignControls.kt`)**:
+   - Ported `liquid-toggle.tsx` (`52x32` viewBox, 2-circle scale/translate morph + metaball bridge + `dropCircle` at `cx=35, cy=-1, r=2.5`, with `default`, `success`, `warning`, `danger`, and `lime` variants) to `LiquidToggle` across all toggle switches in the app.
+   - Ported `slider-05.tsx` (44-bar equalizer wave slider with cosine finger dip, active sine wave arc, and floating spring tooltip pill) to `Slider05` and wired it to `VolumeControl` on both the Home and Music screens.
+3. **Fixed Layout & Card Height Regressions (`ControlScreens.kt`, `AutomationScreens.kt`, `WledScreens.kt`)**:
+   - Fixed `Vol 100%` wrapping onto 3 lines in `HomeBrightnessAndVolumeHeroCard` by giving all 4 quick volume chips (`Vol 25%`, `Vol 50%`, `Vol 75%`, `Vol 100%`) and 4 brightness chips (`15%`, `40%`, `70%`, `100%`) equal `Modifier.weight(1f)` and single-line `maxLines = 1, softWrap = false`.
+   - Fixed routine cards in `RoutinesScreen` (`AutomationScreens.kt`) changing height when toggled off due to `"DISABLED"` wrapping 1 character per line vertically next to long routine names (`"Goodnight & Sleep"`).
+   - Fixed `Esp32MusicPipelineQuickBanner` (`WledScreens.kt`) changing height when switching between `Inbuilt ESP32 Music` and `WLED FX Engine` by enforcing single-line ellipsized subtitles and equal-weight `52.dp`-high mode buttons.
+   - Fixed the `Delete` button squishing vertically in `WledSegmentsTab` (`WledScreens.kt`) and added interactive **Zone Boundary Presets** and **Step-Determination Mode Selectors** (`Linear 1 px/step`, `2-LED Block Steps`, `4-LED Block Steps`, `Staggered Dotted Steps`, `Wide Spaced Steps`, `Center-Out Mirrored Steps`, `Reversed Stop→Start Steps`) with live step count and formula readout.
+4. **Hardware-Accurate WS2812B LED Strip Representation (`WledScreens.kt`)**:
+   - Upgraded `WledAnimatedStripCanvas` to render a recessed dark PCB channel with discrete SMD5050 pixel housings, crisp inner emitter diodes, specular center highlights, segment boundary markers, and true unlit state when strip power is OFF.
+5. **Disabled Child Controls When Section Toggles Are OFF & Functional 3-Band EQ (Bass/Mid/Treble) in Settings (`ControlScreens.kt`, `WledScreens.kt`, `WledSettingsScreens.kt`, `SoundTuning.kt`, `RoomModel.kt`, `DeviceScreens.kt`, `ServiceScreens.kt`)**:
+   - Disabled and dimmed (`alpha = 0.42f`, `enabled = false`) child controls whenever a section's toggle is OFF (Brightness, Music Volume, Color Correcting, Segment power, ESP32 Native Music power, AudioReactive DSP, and AGC manual sensitivity).
+   - Preserved `bass_gain`, `mid_gain`, and `treble_gain` (`0–200%`) in `RoomModel.deviceRequest`, `demoState()`, and `SoundTuning`, and added `RoomThreeBandEqSettingsCard` to Settings (`DeviceSystemScreen`, `SystemScreen`) and `Esp32NativeMusicPipelineTab`.
+
+---
+
+## 22. V19 Addendum — Spotify Linking in Settings, Master Automation Toggle for All Routines, Theme-Colored LiquidToggle Without Stray Dot, Redesigned Config Page & Complete UI/UX Layout Fixes (Android 0.4.5 / versionCode 16)
+
+Recorded 22 October 2026 (Asia/Calcutta). Existing sections 1–21 above are preserved byte-for-byte.
+
+### 22.1 Scope of V19 Android Changes (`0.4.5` / `versionCode 16`)
+
+1. **Shifted "Connect Spotify" to Settings (`ServiceScreens.kt`, `DeviceScreens.kt`, `MainActivity.kt`)**:
+   - Added `SpotifyAccountSettingsCard(model, ui)` to `SystemScreen` and `DeviceSystemScreen` (Settings), containing the full Spotify OAuth / PKCE Client ID setup, redirect URI (`http://127.0.0.1:8765/callback` / `roomcontroller://spotify-auth`), Connect/Reconnect action, and status badge.
+   - Removed the Spotify setup card from `MusicScreen` and `DeviceMusicScreen`, leaving a streamlined `"Open Settings to link Spotify"` button when unlinked.
+2. **Master "Automations active" Toggle Turns All Routines ON and OFF Simultaneously (`AutomationScreens.kt`, `RoomModel.kt`, `PreviewData.kt`)**:
+   - Added `RoomModel.setAllRoutinesEnabled(enabled: Boolean)` which updates every rule's `enabled` state and `settings.automation_enabled` together, persists immediately to DataStore, and synchronizes with the controller (`/v1/command` `op: "put", collection: "rules"`, `op: "automation"`, and `/actions` `action: "set_all_rules"`).
+   - Wired the `Automations active` `LiquidToggle` in `RoutinesScreen` directly to `model.setAllRoutinesEnabled(nextArmed)`.
+3. **Theme-Colored `LiquidToggle` & Removal of Stray White Dot (`DesignControls.kt`)**:
+   - Changed `LiquidToggle`'s active track color from hardcoded blue (`#275EFE`) to `Lime` (the active theme accent color from `LocalRoomPalette.current.accent`).
+   - Removed the stray white `dropCircle` (`cx=35, cy=-1, r=2.5`) above the white thumb circle, added a subtle contrast ring around the thumb, and locked `Modifier.requiredSize(width = 52.dp, height = 32.dp)` so toggle switches never squash or deform in narrow rows.
+4. **Redesigned Config Page & Fixed All 6 Screenshot Layout / Truncation / Deformed Button Issues (`WledSettingsScreens.kt`, `WledScreens.kt`, `ControlScreens.kt`, `SoundTuning.kt`, `MainActivity.kt`)**:
+   - Redesigned `WledControllerSettingsSection` (`WledSettingsScreens.kt`) with a clean 2x4 category grid (`Overview`, `Wi-Fi & AP`, `LEDs & Power`, `Sync & Live`, `Buttons & Backup`, `Audio DSP`, `Security & OTA`, `Time & Macros`), concise non-truncating headers, `SettingToggleRow` across all toggles (fixing squished/invisible UDP broadcast and OTA lock toggles), and equal-weight single-line buttons.
+   - Fixed `WledInfoDiagnosticsCard` (`WledScreens.kt`) header wrapping, `0.42f`/`0.58f` key/value column alignment, and equal-weight `"Refresh Info"` / `"Reboot WLED"` buttons.
+   - Fixed `Esp32NativeMusicPipelineTab` (`WledScreens.kt`) top card (`Core 0 · INMP441 I²S DSP` and `Core 1 · WS2812B Engine` on single lines), compact 2–3 line `FFT REAL-TIME VIEW · RMS` + 3-band meters, single-line contracted mode rows that expand cleanly when selected, and equal-weight non-wrapping bottom buttons (`"Save Mic & EQ"` / `"5s Calibrate"` and `"Apply to ESP32"` / `"Save Preset"`).
+   - Shortened verbose `SectionLabel` titles and trailing badges across `ControlScreens.kt`, `SoundTuning.kt`, `WledScreens.kt`, and `WledSettingsScreens.kt` so Quick Settings and section headers never truncate to `"..."`.
+
+---
+
+## 23. V20 Addendum — Slider Thumb Touch Protection, Glitch-Free Home Brightness, 4-Favorite Limit & Warning Dialog, Unified 300-LED Live Strip Preview, Single Music Controller with Active Device Dropdown, Synced Artwork, Instant Volume & Speaker IR Volume Control (Android 0.4.6 / versionCode 17)
+
+Recorded 22 October 2026 (Asia/Calcutta). Existing sections 1–22 above are preserved byte-for-byte.
+
+### 23.1 Scope of V20 Android Changes (`0.4.6` / `versionCode 17`)
+
+1. **Slider Thumb Touch Protection & Glitch-Free Home Brightness (`DesignControls.kt`, `WledModel.kt`, `RoomModel.kt`, `MainActivity.kt`)**:
+   - Touching within `28.dp` of a slider thumb attaches directly to the current value (`attachRelative = true`) without jumping the value and tracks relative finger movement (`dx / usableWidth`).
+   - Extended external state lockout to `750ms` after drag release across `LedSlider`, `Slider05`, `BrightnessControl`, `VolumeControl`, and `SettingSlider`.
+   - Eliminated the DataStore reactive feedback loop in `WledModel` (`lastSavedSnapshotJson` guard + active-command lockout) and `RoomModel` (`lastSavedStateJson` guard), and wrapped the top `LinearProgressIndicator` in `MainActivity.kt` inside a fixed `3.dp` `Box` so adjusting brightness on the Home screen never glitches or shifts layout height.
+2. **Favorites in Home Quick Presets, Category Filtering, Preset Limit (`4`) & Warning Dialog (`ControlScreens.kt`, `RoomModel.kt`, `WledScreens.kt`)**:
+   - Surfaced all favorited items (WLED Presets, Room Scenes, Effects, Sound Modes, Palettes, Color Swatches) in `HomePresetCategorySection` ("Quick Presets") and under their matching category chips (`Favorites`, `Ambient`, `Vibrant FX`, `Music & Sound`, `Focus & Work`, `Playlists`, `Room Scenes`).
+   - Capped displayed preset buttons at `MAX_HOME_PRESETS = 4` (with a `Page X/Y` chip to cycle when a category has more than 4 presets).
+   - Enforced `MAX_FAVORITES_LIMIT = 4` in `RoomModel.toggleFavorite`: attempting to add a 5th favorite triggers `favoriteLimitWarning` and displays an `AlertDialog` (`"Favorite Limit Reached (4/4)"`) + Snackbar instructing the user to remove an existing favorite first.
+3. **Header, Mode Box, Nightlight Timer & Config Tab Refinements (`ControlScreens.kt`, `WledScreens.kt`, `WledSettingsScreens.kt`)**:
+   - Screenshot 1: Updated `HomeColorCorrectingCard` header to `"Color Studio"` with a `#HEX` pill and a concise subtitle below.
+   - Screenshot 2: Shortened `WledStripPreviewCard` label to `"LIVE LED STRIP · ${snap.ledCount} LEDS · ${snap.fps} FPS"`, removed the verbose subtitle under `"Music Response"`, and shortened the two mode selector boxes to `"ESP32 Music"` (`"Inbuilt DSP"`) and `"WLED FX"` (`"Strip FX"`).
+   - Screenshot 3: Gave Nightlight `"Start Timer"` / `"Update Timer"` and `"Stop Timer"` equal `Modifier.weight(1f)` and single-line text so `"Stop Timer"` never wraps vertically.
+   - Screenshot 4: Shortened `CONFIG_TABS` labels in `WledSettingsScreens.kt` to `"Wi-Fi"`, `"LEDs"`, `"2D"`, `"UI"`, `"UDP"`, `"Time"`, `"Audio"`, `"Security"`.
+4. **Unified 300-LED Live Strip Preview (`WledCatalogDefaults.kt`, `WledModel.kt`, `ControlScreens.kt`)**:
+   - Screenshot 5: Unified the default 300-LED strip segments in `WledCatalogDefaults.kt`, added `sanitizeSnapshotSegments` in `WledModel.kt` to repair persisted snapshots where Segment 1 (`LEDs 150–300`) was stuck on static pink `[255, 0, 128]`, and updated all segments together when applying colors from Home.
+5. **Single Music Controller, Active Device Dropdown, Synced Album Art, Instant Volume & Speaker/Device IR Volume Control (`MusicPlayerWidget.kt`, `ServiceScreens.kt`, `DeviceScreens.kt`, `RoomModel.kt`, `PreviewData.kt`)**:
+   - Screenshots 6 & 7: Removed the duplicate first `SpotifyLocalNetworkControlCard` from `MusicScreen` and `DeviceMusicScreen`.
+   - Added `SpotifyDeviceDropdownSelector` to the device pill inside `MusicPlayerCard` (`MusicPlayerWidget.kt`) so tapping `"Desk speaker"` opens a dropdown listing all active Spotify-linked devices (`Desk speaker`, `Living Room TV`, `Bedroom Echo Dot`, `MacBook Pro Studio`) to switch playback output directly, and removed the separate `"Play it here"` section.
+   - Synced album artwork (`AsyncImage`) with the active playing track across `PreviewData.kt`, `RoomModel.kt`, `MusicPlayerWidget.kt`, `ServiceScreens.kt`, and `DeviceScreens.kt`.
+   - Removed the `"Set volume"` and `"Refresh"` buttons; wired Spotify Volume to update instantaneously on slider drag (`model.coalescedVolume`) and added `SpeakerIrVolumeControl` directly below for physical speaker/device volume via IR (`model.coalescedSpeakerIrVolume` + `IR Vol −`, `Mute`, `IR Vol +`).
+
+---
+
+## 24. V21 Addendum — Mute-Locked Volume Slider, Obsidian Black & Light Theme Contrast, All 8 Screenshot Fixes, Interactive 3-Band EQ Sliders, Scrollable Quick Presets, Playlist Save/Edit, Reactor Power Bar, LimelightNav, Rotary Time Picker & IR Receive Telemetry (Android 0.4.7 / versionCode 18)
+
+Recorded 23 October 2026 (Asia/Calcutta). Existing sections 1–23 above are preserved byte-for-byte.
+
+### 24.1 Scope of V21 Android Changes (`0.4.7` / `versionCode 18`)
+
+1. **Mute Button Locks Volume Slider, Pure Black (`obsidian`) Theme & Light Theme (`pearl`) Volume Rocker Contrast (`Appearance.kt`, `DesignControls.kt`, `RoomModel.kt`, `ControlScreens.kt`, `DeviceScreens.kt`, `ServiceScreens.kt`)**:
+   - Pressing `Mute` in `SpeakerIrVolumeControl` toggles `speaker_muted` in `RoomModel` and locks/disables the `Slider05` volume slider and `IR Vol −` / `IR Vol +` buttons until unmuted.
+   - Added the **Black (`obsidian`)** theme (`#000000` background, `#0B0D12` panel, `#00F0FF` accent, `#FFFFFF` text) and updated `Slider05` to use theme-aware colors (`Cream`, `Lime`, `Panel`, `Night`) so active/inactive equalizer bars and floating tooltips remain crisp in Light (`Pearl`) theme.
+2. **All 8 Screenshot Fixes (`WledScreens.kt`, `WledSettingsScreens.kt`, `ControlScreens.kt`)**:
+   - Screenshot 1 (`Esp32NativeMusicPipelineTab`): Removed the `Core 0 · INMP441 I²S DSP` and `Core 1 · WS2812B Engine` info rows and replaced the 3 static `Bass #0`, `Mids #6`, `Treble #13` boxes with interactive Bass, Mid, and Treble sliders (`0–200%`) wired to `model.coalescedMicrophone`, paired with live FFT level readouts.
+   - Screenshot 2 (`WledTopActionBar`, `WledStripPreviewCard`, `Esp32MusicPipelineQuickBanner`): Fixed the `100%` brightness chip so `%` is never clipped, shortened `LIVE LED STRIP` to `LIVE STRIP`, redesigned `ESP32 Music` vs `WLED FX` into a zero-gap segmented pill switcher, and put the sub-tabs in a single-row `horizontalScroll`.
+   - Screenshot 3 (`Esp32NativeMusicPipelineTab`): Shortened `"Apply to ES..."` to **`Apply ESP32`**.
+   - Screenshot 4 (`HomePresetCategorySection`): Fixed `"Quick Presets"` header, removed pagination buttons, placed category chips in a single-row `horizontalScroll`, and made the preset list smoothly scrollable (`verticalScroll`).
+   - Screenshot 5 (`HomeBrightnessAndVolumeHeroCard`, `HomeColorCorrectingCard`): Removed `"PRIMARY CONTROL · 01"` and `"PRIMARY CONTROL · 02"` headers, added `SpeakerIrVolumeControl` directly inside the Home hero card below `Music Volume`, and fixed the `#HEX` badge in `Color Studio`.
+   - Screenshot 6 (`WledPresetsAndPlaylistsTab`): Enabled saving new playlists (`Save Playlist #N` and `Save & Play` always enabled with auto-default name & steps) and added an **`Edit`** button on each saved playlist row to load it back into the editor.
+   - Screenshot 7 (`WledButtonsAndBackupCard`): Shortened `"Save Security"` to **`Save Lock`**.
+   - Screenshot 8 (`WledEffectsTab`): Fixed `"Show all 170"` vertical character wrapping and placed effect filter chips in a single-row `horizontalScroll`.
+3. **Illuminated Reactor Power Button, `LimelightNav` Integration, `RotaryTimePicker` & IR Receive Signal / Reaction UI (`WledScreens.kt`, `DesignControls.kt`, `MainActivity.kt`, `AutomationScreens.kt`, `/components/ui/limelight-nav.tsx`, `/components/ui/demo.tsx`)**:
+   - Redesigned the `Light` section power button into an illuminated reactor power bar with glowing radial icon and `ON`/`OFF` badge.
+   - Added `/components/ui/limelight-nav.tsx` and `/components/ui/demo.tsx` and ported `LimelightNavBar` to Jetpack Compose for the bottom navigation bar.
+   - Added `RotaryTimePicker` (drum wheels + circular rotary jog dial) for routine schedules in `RuleDialog`, and added `IrReceiverTelemetryCard` & `IrTriggerDefinitionSection` defining incoming 38 kHz IR signals on GPIO 34 and testing controller reactions.
+
+---
+
+## 25. V22 Addendum — Instantaneous Navigation, Minimalist Hardware RotaryTimePicker, Static 2-Column IR Command Grid, Segment/Music DSP/WLED Top Bar Alignment, Dismissible Popup Cross Button, Deep Black + Champagne Gold Theme & Complete ESP32 Connection + Command Specification (Android 0.4.8 / versionCode 19)
+
+Recorded 24 October 2026 (Asia/Calcutta). Existing sections 1–24 above are preserved byte-for-byte.
+
+### 25.1 Summary of All V22 Android App Code Changes (`0.4.8` / `versionCode 19`)
+
+1. **Instantaneous Bottom Navigation (`MainActivity.kt`, `DesignControls.kt`, `RoomModel.kt`)**:
+   - Decoupled bottom bar tab switching (`selectPage`) from asynchronous DataStore writes by updating `page` state immediately on tap, keeping per-tab `ScrollState` instances cached in memory (`scrollStates`), and running `model.setPage(page)` inside `LaunchedEffect(page)`.
+   - Tuned `LimelightNavBar` (`DesignControls.kt`) indicator motion to a critically damped fast spring (`dampingRatio = 0.90f, stiffness = 1500f`) and removed scale-bounce delay so switching between `Home`, `Music`, `Light`, `Remote`, and `More` has zero lag.
+2. **All 5 User Screenshot Fixes (`WledScreens.kt`, `DesignControls.kt`, `AutomationScreens.kt`, `RoomModel.kt`, `PreviewData.kt`)**:
+   - **Screenshot 1 (`WledSegmentsTab` in `WledScreens.kt`)**:
+     - Replaced truncated `"HOW LOGICAL STEPS ARE DETERMINED ON THIS ..."` with **`LOGICAL STEP MODE`**.
+     - Replaced uneven `FlowRow` layouts with equal-width `Modifier.weight(1f)` grids: Zone Boundary Presets in a 3×2 grid, Step-Determination Modes in a 2-column grid + full-width bottom button, and Segment Flags (`Reverse`, `Mirror`, `Freeze`, `Selected`) in a 2×2 grid.
+     - Fixed `"75 logical steps"` wrapping into 3 vertical lines (`75 / logical / steps`) by rendering a single-line `"75 steps"` pill alongside a single-line `Zone: ...` header.
+     - Changed `Start LED`, `Stop LED`, `Grouping`, and `Spacing` `OutlinedTextField`s from a cramped 4-in-a-row layout to a spacious **2×2 grid** (`Start LED` | `Stop LED` on row 1, `Grouping` | `Spacing` on row 2) so field labels never truncate.
+   - **Screenshot 2 ("Road 3" = `RotaryTimePicker` in `DesignControls.kt` & `RuleDialog` in `AutomationScreens.kt`)**:
+     - Fixed `"Minutes"` button wrapping onto 3 lines (`Mi / nu / tes`) by placing `"SCHEDULE · 24H"` on the left and a compact single-line `[Hours | Minutes]` pill switcher (`maxLines = 1, softWrap = false`) on the right.
+     - Redesigned `RotaryTimePicker` into a minimalist, luxury hardware time setter with:
+       1. Large interactive `HH : MM` `RotaryDigitBox` readouts (supporting tap-to-focus and vertical drag scrubbing) flanked by `−1`, `+1`, and `+15m` quick steppers.
+       2. A clean 168 dp circular hardware dial with 12 precision ticks, active arc, and draggable pointer handle.
+       3. A single 5-item equal-width preset row (`07:00`, `09:00`, `18:30`, `22:00`, `23:30`).
+     - Removed the duplicate outer time preset row in `RuleDialog` (`AutomationScreens.kt`) and aligned `Every day / Weekdays / Weekends` (3 equal columns) and `Mon..Sun` (7 equal columns).
+   - **Screenshot 3 (`IrTriggerDefinitionSection` & `IrReceiverTelemetryCard` in `AutomationScreens.kt`, `RoomModel.kt`, `PreviewData.kt`)**:
+     - Seeded all 6 standard room IR commands (`power`, `fan-speed-up`, `fan-speed-down`, `volume-up`, `volume-down`, `speaker-mute`) in `demoState()` and `PreviewSession.seed()` and merged them with any custom learned IR commands so every command is always selectable.
+     - Rendered `Any IR signal` + all IR commands in a **static 2-column grid (`chunked(2)`)** with **zero horizontal or vertical scrolling**.
+     - Removed the `GPIO 34` badge, `38 kHz DEMOD` badge, and verbose hardware explanation box (`"When the ESP32 IR receiver (GPIO 34) decodes..."`), and formatted `"ir_received"` as `"IR received"` in the trigger selector.
+   - **Screenshot 4 ("Essay 32, DPA section" = `Esp32NativeMusicPipelineTab` in `WledScreens.kt`)**:
+     - Fixed `"Mids #6 (Vocals / Snare)"` + `"FFT 120% · Gain 200%"` wrapping onto 2–3 lines by giving the band title `Modifier.weight(1f)` with `maxLines = 1, softWrap = false` and placing `FFT X% · Gain Y%` in a compact non-wrapping badge across `Bass #0`, `Mids #6`, and `Treble #13`.
+   - **Screenshot 5 (`WledTopActionBar` in `WledScreens.kt`)**:
+     - Removed the `"..."` description text under `"Bedroom WLED"`.
+     - Redesigned the `Light` power button into a sleek, minimalist single-line `"Power"` + `"ON"`/`"OFF"` bar (`48.dp` height, no verbose subtext).
+     - Arranged the 6 utility pills (`Timer`, `Sync`, `Peek`, `Info`, `Config`, `PC Mode`) into a non-clipping **3×2 equal-width grid**.
+3. **Dismissible Popup Notification Cross Button (`MainActivity.kt`)**:
+   - Replaced the default `SnackbarHost` content with a custom high-contrast pill card containing a **`✕` (`Icons.Outlined.Close`, `testTag = "snackbar_close_button"`)** `IconButton` that calls `data.dismiss()` immediately.
+4. **Pure Deep Black + Champagne Gold (`obsidian`) Theme (`Appearance.kt`, `DesignControls.kt`)**:
+   - Updated the `obsidian` ("Black") palette in `Appearance.kt` to pure deep black (`night = #000000`, `panel = #070707`, `line = #1C1C1C`, `muted = #9E9E9E`, `cream = #FFFFFF`) paired with a warm, premium **Champagne Gold (`#E5C158`)** accent instead of blue/cyan.
+   - Updated `LiquidToggle`'s inactive track color from bluish `#2E3346` to neutral `Line`.
+
+---
+
+### 25.2 Complete ESP32 Connection & Command Specification (Reference for Updating ESP32 Firmware)
+
+This section defines **how the Android app connects to the ESP32** and **every command payload and endpoint** sent by the app so that the ESP32 firmware can be kept in 100% parity.
+
+#### A. Network Discovery, Addressing & Transport Architecture (`DeviceTransport.kt`, `WledProtocol.kt`)
+
+1. **Dual-Plane Transport on the Same ESP32 Host**:
+   - **Room Controller Plane (`DeviceTransport.kt`)**:
+     - Default base URL: `http://<esp32-ip>` (or `http://roomcontroller.local`, or optional FastAPI companion `http://<host>:8000`).
+     - Discovery: Reads saved endpoint from DataStore, falls back to bundled `assets/device_config.json` (`default_endpoint`, `board_id`, `api_key`, `signing_secret`, `basic_username`, `basic_password`), and probes `/v1/device` or `/health` on LAN candidates (`250 ms` connect timeout).
+   - **WLED Lighting Plane (`WledProtocol.kt`)**:
+     - Uses the same ESP32 host IP (`http://<esp32-ip>/json/...`).
+     - Supports **UDP Realtime Live Stream (`WledUdpStreamer`)** on UDP port **`21324`** (DNRGB protocol byte `4`, timeout `2 s`, chunked at `480 LEDs/packet`: `[4, 2, startHi, startLo, R0, G0, B0, ...]`) for zero-latency live color wheel / slider / peek streaming.
+     - Automatically throttles HTTP slider updates to `24 ms` (`coalescedLighting`, `coalescedVolume`, `coalescedSpeakerIrVolume`, `coalescedMicrophone`) and skips HTTP when UDP realtime is active.
+
+2. **Authentication & Request Signing Headers (`DeviceTransport.kt`)**:
+   Every HTTP request from the Android app to the Room Controller plane includes:
+   - `X-API-Key: <api_key>` (when configured)
+   - `Authorization: Basic base64(<basic_username>:<basic_password>)` (when configured)
+   - `X-Timestamp: <unix_epoch_seconds>`
+   - `X-Nonce: <16_byte_hex_random>`
+   - `X-Signature: <hex(HMAC_SHA256(signing_secret, METHOD + "\n" + PATH_AND_QUERY + "\n" + TIMESTAMP + "\n" + NONCE + "\n" + SHA256_HEX(BODY)))>`
+   - **ESP32 Firmware Implementation Note**: The ESP32 HTTP server should accept requests either by verifying `X-API-Key` / `X-Signature` (when `security.require_key == true` / `require_signature == true`) or allowing LAN requests when unauthenticated local access is enabled.
+
+---
+
+#### B. Room Controller Plane HTTP Endpoints & Exact JSON Command Payloads
+
+The app communicates with the ESP32 using two primary patterns:
+- **Direct ESP32 Firmware API**: `GET /v1/state`, `GET /v1/device`, `POST /v1/command`, `POST /v1/ota`
+- **Companion / Fallback API**: `GET /bootstrap`, `GET /health`, `POST /actions`, `PUT /lighting`, `PUT /microphone`, `PUT /automation`, `PUT /settings`, `POST /ota/stage`
+
+When connected directly to the ESP32 (`DirectEsp32 == true`), **all mutations go through `POST /v1/command`** with `Content-Type: application/json` and expect back the updated state snapshot (or `{"ok": true, ...}` followed by state refresh). Below is every `op` value sent to `POST /v1/command`:
+
+##### 1. Lighting & Native ESP32 Music Pipeline (`op: "lighting"`)
+Sent by Home Brightness, Color Studio, Quick Presets, and the `ESP32 Music` tab (`Esp32NativeMusicPipelineTab`):
+```json
+{
+  "op": "lighting",
+  "power": true,
+  "mode": "music",
+  "brightness": 82,
+  "speed": 60,
+  "intensity": 75,
+  "color": "#53F3C3",
+  "secondary_color": "#64AAFF",
+  "palette": "aurora",
+  "sound_reactive": true,
+  "sound_mode": "bands",
+  "quiet_mode": "off",
+  "Preset_id": "preset-aurora",
+  "zone": "all",
+  "kelvin": 4200,
+  "hue": 162,
+  "saturation": 88
+}
+```
+- **`mode`**: `"solid"`, `"gradient"`, `"pulse"`, `"rainbow"`, `"strobe"`, `"candle"`, or `"music"` (activates `1.1.4-music` native `MusicLightingEngine` on Core 1).
+- **`sound_mode`** (when `sound_reactive == true` or `mode == "music"`):
+  - `"beat"` — Beat Pulse + Palette Drift (adaptive threshold `1.38x`, 90 ms cooldown, 25 ms frame clock)
+  - `"bass"` — Bass Center Curtain (symmetric outward from center LEDs `149/150` across `0..299`)
+  - `"bands"` — 3-Band Split Strip (Bass `0..99` `#FF2800`, Mids `100..199` `#00FF50`, Treble `200..299` `#0078FF`)
+  - `"level"` — Full-Strip VU Meter (`0..299` proportional to smoothed RMS with peak hold)
+  - `"solid"` — Audio-Modulated Solid Color (`color` scaled by real-time audio envelope)
+- **`quiet_mode`**: `"off"` (blackout below noise floor) or `"ambient"` (15% dim warm ambient glow when room is quiet).
+
+##### 2. INMP441 Microphone & 3-Band EQ DSP (`op: "microphone"`)
+Sent by the `Bass #0`, `Mids #6`, `Treble #13` sliders (`0–200%`), Noise Floor / Sensitivity sliders, AGC toggle, and `Save Mic & EQ` in `Esp32NativeMusicPipelineTab` and Settings:
+```json
+{
+  "op": "microphone",
+  "enabled": true,
+  "agc": true,
+  "sensitivity": 68,
+  "noise_floor": 18,
+  "bass_gain": 120,
+  "mid_gain": 100,
+  "treble_gain": 110,
+  "input_pin": 32,
+  "sample_window_ms": 32
+}
+```
+- **ESP32 Firmware Implementation Note (`MusicAudioDSP` on Core 0)**:
+  - `bass_gain`, `mid_gain`, `treble_gain` are percentages (`0..200`, where `100` = `1.0x` unity gain) applied to the 16-bin FFT buckets: Bass (`#0..#2`), Mids (`#3..#8`), Treble (`#9..#15`).
+  - Returning `bass_level`, `mid_level`, `treble_level`, `live_level`, and `peak_level` (`0..100`) in `GET /v1/state` under `"microphone"` drives the live `FFT X%` readouts in the app.
+
+##### 3. Microphone 5-Second Noise-Floor Calibration (`op: "calibrate_microphone"`)
+```json
+{
+  "op": "calibrate_microphone",
+  "duration_s": 5
+}
+```
+- **ESP32 Action**: Sample INMP441 ambient RMS for 5 seconds, set `microphone.noise_floor` slightly above ambient peak, and update `microphone.last_calibrated`.
+
+##### 4. Infrared (IR) Transmit, Learn, Delete & Receive Trigger (`op: "ir_send"`, `op: "ir_learn"`, `op: "delete"`, `op: "ir_simulate_rx"`)
+- **Send IR Command (`op: "ir_send"`)** — triggered by Remote buttons and Speaker IR Volume (`IR Vol −`, `Mute`, `IR Vol +`):
+  ```json
+  {
+    "op": "ir_send",
+    "id": "volume-up"
+  }
+  ```
+  Standard command IDs seeded in the app:
+  - `"power"` (`0x20DF10EF`, NEC 32-bit, Power toggle)
+  - `"fan-speed-up"` (`0x20DF40BF`, NEC 32-bit, Fan +)
+  - `"fan-speed-down"` (`0x20DFC03F`, NEC 32-bit, Fan -)
+  - `"volume-up"` (`0x20DF40BF` / speaker NEC code, Vol +)
+  - `"volume-down"` (`0x20DFC03F` / speaker NEC code, Vol -)
+  - `"speaker-mute"` (`0x20DF906F`, NEC 32-bit, Mute toggle)
+- **Speaker IR Volume Level (`op: "speaker_ir_volume"`)** — triggered when dragging the Speaker / Device Volume slider on Home or Music:
+  ```json
+  {
+    "op": "speaker_ir_volume",
+    "volume": 65,
+    "delta": 5
+  }
+  ```
+  **ESP32 Action**: Emit the corresponding number of IR volume step pulses (`volume-up` or `volume-down`) on the IR blaster GPIO (`GPIO 4` / `ir_tx_gpio`) and store `settings.speaker_volume = 65`, `settings.speaker_muted = false`.
+- **Speaker IR Mute Toggle (`op: "speaker_ir_mute"`)** — triggered by the `Mute` / `Unmute` button:
+  ```json
+  {
+    "op": "speaker_ir_mute",
+    "muted": true
+  }
+  ```
+  **ESP32 Action**: Transmit the `"speaker-mute"` IR code and set `settings.speaker_muted = muted`.
+- **Capture / Learn IR Signal from GPIO 34 Demodulator (`op: "ir_learn"`)**:
+  ```json
+  {
+    "op": "ir_learn",
+    "name": "AC Cool 24C",
+    "category": "ac",
+    "icon": "ac",
+    "timeout_s": 12
+  }
+  ```
+  **ESP32 Action**: Arm the 38 kHz IR receiver (`GPIO 34` / `ir_rx_gpio`) for up to `timeout_s` seconds, decode the incoming frame (`NEC` / `RC5` / `Sony` / `RAW`), store it in `ir_commands`, and update `settings.last_ir_rx_*`.
+- **Simulate / Test IR Receive Trigger (`op: "ir_simulate_rx"`)** — triggered by the `"Test Reaction"` button in `RuleDialog`:
+  ```json
+  {
+    "op": "ir_simulate_rx",
+    "ir_id": "power",
+    "code": "0x20DF10EF",
+    "protocol": "NEC"
+  }
+  ```
+  **ESP32 Action**: Run the same routine-matching pipeline as when the physical IR receiver decodes `code`, executing any enabled routine in `rules` where `trigger_type == "ir_received"` and (`trigger_value == ""` or `trigger_value == ir_id` or `trigger_value == code`).
+
+##### 5. Routines / Schedules / Automations (`op: "put"`, `op: "delete"`, `op: "run_rule"`, `op: "automation"`)
+- **Create or Update a Routine (`op: "put", "collection": "rules"`)**:
+  ```json
+  {
+    "op": "put",
+    "collection": "rules",
+    "item": {
+      "id": "rule-sunset",
+      "name": "Evening Warmth",
+      "enabled": true,
+      "trigger_type": "schedule",
+      "trigger_value": "18:30",
+      "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "condition_type": "always",
+      "condition_value": "",
+      "action_type": "scene",
+      "action_target": "scene-cozy",
+      "cooldown_s": 60,
+      "last_run": "Never"
+    }
+  }
+  ```
+  - Supported `trigger_type` values:
+    - `"schedule"` — `trigger_value` is `"HH:MM"` (24-hour time from `RotaryTimePicker`), filtered by `days` (`["Mon", "Tue", ...]`).
+    - `"ir_received"` — `trigger_value` is either `""` (`Any IR signal`) or a specific IR command ID (`"power"`, `"fan-speed-up"`, `"fan-speed-down"`, `"volume-up"`, `"volume-down"`, `"speaker-mute"`, or any learned command ID).
+    - `"sound_peak"` — `trigger_value` is RMS threshold (`"75"`).
+    - `"spotify_playing"` — triggers when Spotify playback starts.
+    - `"boot"` — triggers on ESP32 startup.
+    - `"timer"` — countdown timer in minutes.
+  - Supported `action_type` values:
+    - `"scene"` (`action_target` = scene ID)
+    - `"preset"` (`action_target` = lighting preset ID)
+    - `"lighting_power"` (`action_target` = `"on"` or `"off"`)
+    - `"ir"` (`action_target` = IR command ID to transmit)
+    - `"spotify"` (`action_target` = `"play"`, `"pause"`, `"next"`)
+    - `"plug"` (`action_target` = `"<plug_id>:on"` or `"<plug_id>:off"`)
+- **Run a Routine Immediately (`op: "run_rule"`)**:
+  ```json
+  { "op": "run_rule", "id": "rule-sunset" }
+  ```
+- **Master Automation Toggle (`op: "automation"`)**:
+  ```json
+  {
+    "op": "automation",
+    "automation_enabled": true,
+    "sound_trigger_threshold": 78,
+    "quiet_hours_start": "23:30",
+    "quiet_hours_end": "07:00",
+    "sunrise_fade_minutes": 20,
+    "Presence_timeout_minutes": 45
+  }
+  ```
+
+##### 6. Scenes, Presets, Smart Plugs, Timers, Wake Alarms & Spotify (`POST /v1/command`)
+- **Apply Room Scene (`op: "apply_scene"`)**: `{"op": "apply_scene", "id": "scene-focus"}`
+- **Apply Lighting Preset (`op: "apply_preset"`)**: `{"op": "apply_preset", "id": "preset-aurora"}`
+- **Save / Upsert Collection Item (`op: "put"`)**:
+  - `collection`: `"presets"` | `"scenes"` | `"rules"` | `"plugs"` | `"ir_commands"` | `"wake_alarms"`
+  - `item`: full JSON object of the item.
+- **Delete Collection Item (`op: "delete"`)**:
+  - `{"op": "delete", "collection": "rules", "id": "rule-1"}`
+- **Toggle Smart Plug (`op: "toggle_plug"`)**:
+  - `{"op": "toggle_plug", "id": "plug-desk", "power": true}`
+- **Sleep Timer (`op: "sleep_timer"`)**:
+  - `{"op": "sleep_timer", "minutes": 30, "action": "lights_and_music_off"}` (or `minutes: 0` to cancel)
+- **Spotify Local Network Control (`op: "spotify"`)**:
+  - Play / Pause / Next / Previous: `{"op": "spotify", "command": "play"}` (`"pause"`, `"next"`, `"previous"`)
+  - Volume: `{"op": "spotify", "command": "volume", "volume_percent": 70}`
+  - Transfer Playback Device: `{"op": "spotify", "command": "transfer", "device_id": "desk-speaker", "device_name": "Desk speaker"}`
+- **Settings & Hardware Pin Configuration (`op: "settings"`)**:
+  - Updates `room_name`, `controller_host`, `led_count` (`300`), `led_pin` (`16`), `mic_pin` (`32`), `ir_tx_pin` (`4`), `ir_rx_pin` (`34`), `Relay_pin` (`26`), `theme` (`"obsidian"`, `"midnight"`, `"aurora"`, `"ember"`, `"pearl"`), `speaker_volume`, `speaker_muted`, and `favorites`.
+
+---
+
+#### C. WLED Lighting Plane HTTP & UDP Endpoints (`WledProtocol.kt`, `WledScreens.kt`, `WledSettingsScreens.kt`)
+
+All controls in the **Light** tab (`WledTopActionBar`, `WledColorsTab`, `WledEffectsTab`, `WledSegmentsTab`, `WledPresetsAndPlaylistsTab`, `WledControllerSettingsSection`) communicate with the ESP32 WLED JSON API:
+
+1. **`GET /json`** — Returns full `{ "state": {...}, "info": {...}, "effects": [...], "palettes": [...] }`.
+2. **`GET /json/state`** — Polled during live sync to read power (`on`), brightness (`bri` `0..255`), transition (`transition`), preset (`ps`), playlist (`pl`), nightlight (`nl`), UDP sync (`udpn`), live override (`lor`), main segment (`mainseg`), and `seg` array.
+3. **`POST /json/state`** — Sends partial or full WLED state mutations:
+   - **Master Power (`WledTopActionBar`)**: `{"on": true, "v": true}` or `{"on": false, "v": true}`
+   - **Master Brightness (`0..255`)**: `{"bri": 200, "on": true, "v": true}`
+   - **Nightlight Timer (`Timer` pill)**: `{"nl": {"on": true, "dur": 30, "mode": 1, "tbri": 0}, "v": true}`
+   - **UDP Sync (`Sync` pill)**: `{"udpn": {"send": true, "recv": true}, "v": true}`
+   - **Live Override (`LOR` / `PC Mode`)**: `{"lor": 0, "v": true}` (`0` = off, `1` = until live ends, `2` = until reboot)
+   - **Color, CCT & Palette (`WledColorsTab` / Home Color Studio)**:
+     ```json
+     {
+       "on": true,
+       "seg": [
+         {
+           "id": 0,
+           "col": [[229, 193, 88, 0], [18, 22, 31, 0], [0, 0, 0, 0]],
+           "cct": 128,
+           "pal": 11
+         }
+       ],
+       "v": true
+     }
+     ```
+   - **Effect, Speed & Intensity (`WledEffectsTab`)**:
+     ```json
+     {
+       "on": true,
+       "seg": [
+         { "id": 0, "fx": 42, "sx": 148, "ix": 180, "c1": 128, "c2": 128, "c3": 16 }
+       ],
+       "v": true
+     }
+     ```
+   - **Segment Boundaries, Logical Step Modes & Flags (`WledSegmentsTab`)**:
+     ```json
+     {
+       "seg": [
+         {
+           "id": 0,
+           "n": "Full Strip",
+           "start": 0,
+           "stop": 300,
+           "grp": 4,
+           "spc": 0,
+           "of": 0,
+           "on": true,
+           "bri": 255,
+           "rev": false,
+           "mi": false,
+           "frz": false,
+           "sel": true
+         }
+       ],
+       "v": true
+     }
+     ```
+     - Logical step count formula implemented identically in app and ESP32: `ceil((stop - start) / (grp + spc))` (halved when `mi == true` for center-out mirrored steps).
+   - **Presets & Playlists (`WledPresetsAndPlaylistsTab`)**:
+     - Apply Preset `#id`: `{"ps": 1, "on": true, "v": true}`
+     - Save Current State to Preset `#id`: `{"psave": 1, "n": "Warm Sunset", "ib": true, "sb": true}`
+     - Delete Preset `#id`: `{"pdel": 1}`
+     - Save / Start Playlist:
+       ```json
+       {
+         "psave": 100,
+         "n": "Evening Flow",
+         "playlist": {
+           "ps": [1, 2, 3],
+           "dur": [100, 100, 100],
+           "transition": [7, 7, 7],
+           "repeat": 0,
+           "end": 0,
+           "r": false
+         },
+         "on": true
+       }
+       ```
+4. **`GET /json/cfg` & `POST /json/cfg`** — Reads and updates controller hardware/network configuration (`Wi-Fi`, `LEDs` pin/length/max current `mA`, `2D` matrix, `UI`, `UDP` port `21324`, `Time` NTP/timezone, `Audio` I²S pins `SD=32, WS=25, SCK=33` & squelch/gain, and `Security` OTA lock).
+5. **Reboot Controller**: `POST /json/state` with `{"rb": true}` (or `POST /v1/command` with `{"op": "reboot"}`).
+
+
+---
+
+## 26. V23 Synchronization Handoff — Android 0.4.9 (versionCode 20): DataStore Configuration Backup & Restore, Instantaneous Navigation, 12h/24h Clock System, Standalone Playlist Creator Card & Authentic Recorded IR Commands
+
+Recorded 25 October 2026 (Asia/Calcutta). Project delivery advances from **V22** to **V23**; Android source advances from **0.4.8 / versionCode 19** to **0.4.9 / versionCode 20**. Existing archived baseline APK (`0.3.0 / code 5`) and all earlier sections of this document remain untouched.
+
+### 26.1 Summary of V23 App Changes
+
+1. **Configuration Backup & Restore via Jetpack DataStore (`RoomDataStore.kt`, `RoomModel.kt`, `WledModel.kt`, `ServiceScreens.kt`, `DeviceScreens.kt`)**:
+   - Added `exportConfigurationBackup(currentRoomUi, saveLocalSnapshot)` and `importConfigurationBackup(rawJson)` in `RoomDataStore.kt`.
+   - Exported backup JSON uses schema `"roomcontroller.datastore.backup"` (`backup_version = 1`) and bundles both `room_controller` (`state_json`, `theme_id`, `use_24_hour_format`, `selected_page`, `home_preset_category`, `preset_categories_json`, `favorites`) and `wled_controller` (`target_host`, `active_tab`, `pc_mode`, `color_slot`, `effect_filter`, `config_section`, `snapshot_json`, `presets_json`, `config_json`).
+   - Added `DataStoreBackupRestoreCard` in Settings (`SystemScreen` and `DeviceSystemScreen`) with:
+     - **Export `.json`** (`ActivityResultContracts.CreateDocument("application/json")`)
+     - **Import `.json`** (`ActivityResultContracts.GetContent()`)
+     - **Copy / Paste Backup JSON** dialog (`backup_json_dialog_button`) for cross-device clipboard transfer
+     - **Save Local Snapshot** (`backup_snapshot_button`) and **Restore Snapshot** (`restore_snapshot_button`) persisted inside DataStore (`KEY_LAST_BACKUP_JSON` / `KEY_LAST_BACKUP_TIMESTAMP`).
+   - Importing a backup restores all DataStore keys, reloads `WledModel` (`wledModel.reloadFromDataStore()`), updates `RoomModel` UI state immediately, and pushes restored `settings`, `lighting`, and `microphone` payloads to the connected controller.
+
+2. **Instantaneous Zero-Delay Bottom Navigation (`RoomModel.kt`, `WledModel.kt`, `MainActivity.kt`, `ControlScreens.kt`, `ServiceScreens.kt`)**:
+   - Eliminated the ~1.5s delay on tab switches (`Home`, `Music`, `Light`, `Remote`, `More`):
+     - `RoomModel.setPage(page)` now updates `_ui.value = _ui.value.copy(page = page)` synchronously in memory and persists only `KEY_SELECTED_PAGE` on `Dispatchers.IO` without cloning the entire `state: JSONObject` or writing `SharedPreferences` on the main thread.
+     - `RoomModel.savePersistedState()` and `syncDataStore()` now run asynchronously on `Dispatchers.IO` without re-emitting a cloned `JSONObject` back into `_ui.value`.
+     - `WledUi` caches `presetEntries: List<WledPresetEntry> = parseWledPresets(presets)` so `Home` and `Light` screens do not re-parse WLED presets JSON on every recomposition.
+     - `ControlScreens.kt` keys `HomePresetCategorySection` `remember` blocks on `roomPresetsJson` instead of `ui.state.toString()`.
+     - `MusicScreen` performs its initial Spotify playback status check silently without triggering the global `ui.busy` top loading bar on tab entry.
+
+3. **12-Hour (`AM`/`PM`) & 24-Hour Clock System (`DesignControls.kt`, `AutomationScreens.kt`, `ServiceScreens.kt`, `DeviceScreens.kt`, `WledSettingsScreens.kt`)**:
+   - Default clock format is **24-hour** (`use24HourFormat = true`).
+   - Users can switch between **24-Hour (`14:30`)** and **12-Hour (`2:30 PM`)** in Settings (`ClockFormatSettingSelector` in `SystemScreen` and `DeviceSystemScreen`, plus `WledTimeSettingsCard` in `WledSettingsScreens.kt`) or directly inside the `RotaryTimePicker` header (`24H` / `12H` pill button in `RuleDialog`).
+   - `RotaryTimePicker` (`DesignControls.kt`) displays `1..12` hours with `AM`/`PM` selector pills and a 12-hour dial when in 12-hour mode, or `00..23` hours and a 24-hour dial when in 24-hour mode, while always storing canonical `"HH:MM"` 24-hour strings in `rule.trigger_value` for ESP32 firmware compatibility.
+
+4. **Standalone & Aligned Playlist Creation Card (`WledScreens.kt` — Screenshot 1)**:
+   - Saved playlists in `WledPresetsAndPlaylistsTab` now use a 2-row card layout: full-width title + step sequence badge row on top, and `Play Playlist` + `★` + `✎` + `🗑` action row on the bottom so titles never wrap vertically 1 word per line.
+   - Separated **"Create or Edit Playlist"** into its own standalone `RoomCard` with aligned 2-column inputs (`ID (1–250)` and `Playlist name`), step checkboxes, and equal-width `Save #ID` and `Save & Play` buttons.
+
+5. **Removed IR Simulation Section & Enforced Authentic Recorded IR Commands (`AutomationScreens.kt`, `PreviewData.kt` — Screenshot 2)**:
+   - Removed `IrReceiverTelemetryCard` (`"IR Receiver & Signal Test"` / `"Simulate IR Receive & Test Reaction"`) from `RemotesScreen` (`AutomationScreens.kt`). Each learned IR command already has its own inline `Send` (`▶`) button.
+   - Removed hardcoded fallback IR command injection from `buildCompleteIrOptionList` (`AutomationScreens.kt`) and stopped `PreviewSession.seed()` (`PreviewData.kt`) from re-inserting deleted commands. Learned IR commands now record realistic `NEC` (`38 kHz`, `0x20DF...`) protocol metadata.
+
+
+---
+
+## 27. V24 Synchronization Handoff — Android 0.5.0 (versionCode 21): Unique Minimalistic Routine Card Icons, Universal Tactile Haptic Feedback, Foreground MediaSession Service, WledWidget Fixes, Dual HTTP/HTTPS LAN Pairing & Full Audit Resolution
+
+Recorded 25 October 2026 (Asia/Calcutta). Project delivery advances from **V23** to **V24**; Android source advances from **0.4.9 / versionCode 20** to **0.5.0 / versionCode 21**. Existing archived baseline APK (`0.3.0 / code 5`) and all earlier sections of this document remain untouched.
+
+### 27.1 Summary of V24 App Changes
+
+1. **Unique, Minimalistic Icons for Each Routine Card (`AutomationScreens.kt`, `ControlScreens.kt`)**:
+   - Added a 16-entry minimalistic vector icon catalog (`ROUTINE_ICON_CATALOG`) and collision-free icon assignment (`assignUniqueRoutineIcons`) so every routine card receives a distinct, easily scannable icon (`wb_sunny`, `dark_mode`, `graphic_eq`, `bolt`, `spa`, `coffee`, `tv`, `air`, `auto_awesome`, `nightlight`, `timer`, `music_note`, `self_improvement`, `sensors`, `bedtime`, `weekend`).
+   - Added `HomeRoutinesDashboardCard` on `HomeScreen` (`ControlScreens.kt`) and updated `HomeUniversalFavoritesSection` and `RoutinesScreen` (`AutomationScreens.kt`) so routine cards display their unique icon badge and support one-tap execution.
+   - Added an interactive **Routine Icon** picker inside `RuleDialog` (`AutomationScreens.kt`) stored in `rule.icon`.
+
+2. **Subtle Haptic Feedback Across All Button Interactions (`DesignControls.kt`, `MainActivity.kt`, `AutomationScreens.kt`, `ControlScreens.kt`, `MusicPlayerWidget.kt`, `DeviceScreens.kt`, `AndroidManifest.xml`)**:
+   - Added `<uses-permission android:name="android.permission.VIBRATE"/>` in `AndroidManifest.xml` and `performSubtleHaptic(view: View, heavy: Boolean = false)` in `DesignControls.kt`.
+   - Wired tactile haptic feedback across `Modifier.livelyClick`, `Modifier.livelyPressScale`, `ActionButton`, `LiquidToggle`, `LimelightNavBar`, `Choices`, `ConfirmDialog`, `RotaryTimePicker`, `RotaryDigitBox`, `SpeakerIrVolumeControl`, `SpotifyLocalNetworkControlCard`, `MusicPlayerWidget`, routine cards/templates, and snackbar dismiss buttons.
+
+3. **Full Resolution of Audit Report Findings (`Paste_October_25__2026_-_12_43AM_8a0e49d9`)**:
+   - **Audit 1.1 (`room-device.config` Decoupling)**: Removed `.takeIf { configuredDevice != null && it == configuredDevice }` on `pairingVault` in `RoomModel.kt`, added manual LAN IP/hostname + token pairing (`pairManualDevice`) and `pairing.json` import (`importPairingJson`) in `PairDeviceScreen` (`DeviceScreens.kt`), and made `useBuiltInDevice()` fall back gracefully without throwing `IllegalStateException`.
+   - **Audit 1.2 (HTTPS 443 + HTTP 80 Dual Transport)**: Updated `DeviceTransport.kt` to support both SHA-256 leaf-pinned HTTPS (`443`) and LAN HTTP (`80`) with `Authorization: Bearer <token>` and `X-API-Key: <token>` headers while keeping `DevicePairing.parse()` strict for unit test verification.
+   - **Audit 1.3 (Legacy Companion Endpoint Translation)**: Translated `/spotify/player`, `/spotify/devices`, `/spotify/playback`, `/spotify/search`, `/spotify/playlists`, `/spotify/recent`, `/learning`, `/learning/{id}`, `/learning/{id}/save`, `/settings`, `/diagnostics`, and `/jobs/{id}` to `/v1/state` and `/v1/command` in `RoomModel.deviceRequest()`.
+   - **Audit 2.1–2.4 (`WledWidget.kt`)**: Replaced `setBackgroundColor` with `setBackgroundResource` (`@drawable/wled_widget_background`, `@drawable/wled_widget_background_light`, `@drawable/wled_widget_background_obsidian`) to preserve 24dp rounded corners and border, switched widget coroutines to `SupervisorJob() + Dispatchers.IO`, relaxed preset confirmation (`ps == preset || pl == preset || on`), and synced device discovery with `RoomDataStore.readDevicesJson(context)`.
+   - **Audit 3.1–3.4 (`RoomMediaPlaybackService.kt`, `MusicPlayerWidget.kt`, `DeviceScreens.kt`, `RoomModel.kt`, `PreviewData.kt`)**: Added `RoomMediaPlaybackService` (Foreground `MediaSession` + `Notification.MediaStyle`), replaced hardcoded `progress_ms = 41000` / `duration_ms = 210000` in `DeviceMusicScreen` with live state and 250ms playback progress extrapolation in `MusicPlayerWidget`, and wired `seek`, `shuffle`, and `repeat` end-to-end.
+   - **Audit 4.1–4.4 (`WledProtocol.kt`, `RoomModel.kt`, `ControlScreens.kt`)**: Unwrapped any outer `"cfg"` object in `WledApi.saveConfig` before posting to `/json/cfg`, handled combined V10 firmware `"Managed by WLED settings"` responses on `op: "microphone"` / `"calibrate"`, normalized `op: "lighting"` payloads, and deferred `model.coalescedLighting` on Home sliders to `onValueChangeFinished` when WLED is online to avoid dual-transmission storms.
+   - **Audit 5.1–5.4 & 6.1 (`AutomationScreens.kt`, `RoomModel.kt`, `DeviceScreens.kt`, `DeviceTransport.kt`)**: Emitted canonical `action`/`argument`/`value` fields on Spotify routine actions, formatted multi-action routines as `type: "sequence"` with an `actions` array, added compatible fallback when saving `manual` or `sequence` rules to older firmware, defaulted controller timezone to `"IST-5:30"` and enabled saving clock settings even when `settings` is initially empty, and surfaced `runtime.message`/`ir_error` in `DeviceLearnDialog`.
+
+
+---
+
+## 28. V25 Synchronization Handoff — Android 0.5.1 (versionCode 22): Spotify DataStore OAuth Connection Flow & Basic Playback Control UI, Full "Restore Snapshot" & "Light Brightness" 100% Labels, Unclipped Routine RotaryTimePicker & Reliable WLED Playlist Saving
+
+Recorded 25 October 2026 (Asia/Calcutta). Project delivery advances from **V24** to **V25**; Android source advances from **0.5.0 / versionCode 21** to **0.5.1 / versionCode 22**. Existing archived baseline APK (`0.3.0 / code 5`) and all earlier sections of this document remain untouched.
+
+### 28.1 Summary of V25 App Changes
+
+1. **Spotify OAuth Connection Flow via Jetpack DataStore & Basic Playback Control UI (`RoomDataStore.kt`, `RoomModel.kt`, `SpotifyConnectActivity.kt`, `ServiceScreens.kt`)**:
+   - Added encrypted OAuth credential persistence in `RoomDataStore` (`KEY_SPOTIFY_CONNECTED`, `KEY_SPOTIFY_ACCOUNT_NAME`, `KEY_SPOTIFY_CLIENT_ID`, `KEY_SPOTIFY_ACCESS_TOKEN_ENC`, `KEY_SPOTIFY_REFRESH_TOKEN_ENC`, `KEY_SPOTIFY_EXPIRES_AT_MS`) using Android Keystore AES-GCM (`encryptToken` / `decryptToken`).
+   - Updated `SpotifyConnectActivity` so OAuth PKCE authorization code exchanges save encrypted `access_token` and `refresh_token` credentials directly into `RoomDataStore` in addition to forwarding credentials to a paired ESP32 when available.
+   - Updated `SpotifyAccountSettingsCard` (`ServiceScreens.kt`) with DataStore OAuth connection status, an interactive token setup panel (`spotify_save_datastore_tokens_button`), and an embedded **Basic Playback Control UI** (active track/artist/speaker display, Previous `spotify_prev_button`, Play/Pause `spotify_play_pause_button`, Next `spotify_next_button`, and Spotify volume slider).
+
+2. **Full Display of `"Restore Snapshot"` & `"Configuration Backup"` (`ServiceScreens.kt`)**:
+   - Updated `DataStoreBackupRestoreCard` header to `SectionLabel("Configuration Backup", "DATASTORE")`.
+   - Placed `Save Snapshot` and `Restore Snapshot` in a 2-column row (`Modifier.weight(1f)` each) and moved `Copy / Paste Backup JSON` onto its own full-width row below so `"Restore Snapshot"` is never truncated to `"Restore Snapsh"`.
+
+3. **Unclipped Routine Timer (`RotaryTimePicker` in `DesignControls.kt`)**:
+   - Stacked the `[12-Hour (AM / PM) | 24-Hour (00:00–23:59)]` selector bar and the `[Hours | Minutes]` selection bar onto dedicated full-width rows so the 24-hour and Hours/Minutes selection bars are 100% visible inside `RuleDialog`.
+   - Moved the `HOUR : MINUTE` digital readout boxes (`RotaryDigitBox`, `height = 64.dp`, `24.sp` Monospace Bold) onto their own full-width row above the centered `136.dp` circular rotary dial so 2-digit numbers (`04`, `51`) are never half-cut.
+
+4. **Reliable WLED Playlist Saving & Editing (`WledModel.kt`, `WledCatalogDefaults.kt`, `WledScreens.kt`)**:
+   - Updated `WledCatalogDefaults.applyLocalCommand` to apply `psave` and `pdel` before `ps` and `pl`.
+   - Added `mergePresetsPreservingUserSaves`, `userSavedPresets`, and `presetsRevision` in `WledModel` so newly saved or edited playlists are never overwritten by asynchronous `/presets.json` reads or corrupted by element-wise `JSONArray` merging, and supported atomic `savePlaylist(..., playImmediately = true)`.
+   - Displayed step duration and transition (`110s/step · 7s fade`) on each card in `Saved Playlists`, added an inline save confirmation banner in `Create or Edit Playlist`, and added `76.dp` bottom clearance so the floating snackbar never covers `Save #ID` / `Save & Play`.
+
+5. **Full Display of `"Light Brightness"` at `100%` (`ControlScreens.kt`)**:
+   - Tuned the icon badge (`34.dp`), spacing (`8.dp`), title (`15.sp` SemiBold), and percentage readout (`20.sp` Bold) in `HomeBrightnessAndVolumeHeroCard` so `"Light Brightness"` never truncates to `".."` when brightness reaches `"100%"`.
+
+
+---
+
+## 29. V26 Synchronization Handoff — Android 0.5.2 (versionCode 23): Spotify Local HTTP & Flexible Pairing, Runtime POST_NOTIFICATIONS, Standalone Background Media Controls, and WLED Widget Pill Styling
+
+Recorded 25 October 2026 (Asia/Calcutta). Project delivery advances from **V25** to **V26**; Android source advances from **0.5.1 / versionCode 22** to **0.5.2 / versionCode 23**. Existing archived baseline APK (`0.3.0 / code 5`) and all earlier sections of this document remain untouched.
+
+### 29.1 Summary of V26 App Changes
+
+1. **Spotify Connect HTTP & Flexible Pairing Support (`SpotifyConnectActivity.kt`)**:
+   - Replaced strict `DevicePairing.parse()` with `DevicePairing.parseFlexible()` in both `begin()` and `complete()`.
+   - Updated the origin check to allow both `https://` and `http://` schemes, enabling Spotify PKCE authorization when connected to an ESP32 via manual LAN IP (port 80 or 443).
+
+2. **Runtime `POST_NOTIFICATIONS` Permission (`MainActivity.kt`)**:
+   - Added runtime `POST_NOTIFICATIONS` permission launcher and `LaunchedEffect` check inside `RoomApp` for Android 13, 14, and 15 (SDK 35), ensuring the lock screen and notification shade media playback controls are displayed.
+
+3. **Standalone Background Media Transport & Notification Dismissal (`RoomMediaPlaybackService.kt`)**:
+   - Implemented a standalone background fallback in `dispatchMediaAction()`: when the in-app callback is null (app swiped away or process memory reclaimed), it reads `room-device-pairing` and `endpoint` and dispatches `/v1/command` directly to the ESP32 via `DeviceTransport` on `Dispatchers.IO`.
+   - Attached `ACTION_STOP_SERVICE` to `Notification.Builder.setDeleteIntent()` so swiping away the paused media notification cleanly terminates the service.
+   - Added `RoomMediaPlaybackService.stopMediaPlayback(context)` helper in `companion object`.
+
+4. **Flexible Configured Device Parsing & Service Teardown on Logout (`RoomModel.kt`)**:
+   - Updated `configuredDevice` parsing to use `DevicePairing.parseFlexible(it)`.
+   - Triggered `RoomMediaPlaybackService.stopMediaPlayback()` upon logout and Spotify disconnection to dismiss the notification.
+
+5. **WLED Widget Pill Button Styling & Live Refresh (`WledWidget.kt`, `WledModel.kt`)**:
+   - Removed `views.setInt(R.id.wled_widget_action, "setBackgroundColor", ...)` in `WledWidget.kt` to preserve native rounded pill button geometry.
+   - Added immediate `runCatching { WledWidget.refresh(getApplication()) }` right after `persist()` in `WledModel.command()`.
+
+
+---
+
+## 30. V27 Synchronization Handoff — Android 0.5.3 (versionCode 24): Cold Launch Media Notification Gating, Unpaired Spotify PKCE Linking, Token UI Clipping Fix, and Elimination of Mock Demo Data
+
+Recorded 25 October 2026 (Asia/Calcutta). Project delivery advances from **V26** to **V27**; Android source advances from **0.5.2 / versionCode 23** to **0.5.3 / versionCode 24**. Existing archived baseline APK (`0.3.0 / code 5`) and all earlier sections of this document remain untouched.
+
+### 30.1 Summary of V27 App Changes
+
+1. **Cold App Launch Media Notification Gating (`RoomMediaPlaybackService.kt`, `RoomModel.kt`)**:
+   - Added `@Volatile var isServiceRunning: Boolean` in `RoomMediaPlaybackService` companion object, set to `true` in `onCreate()` and `false` in `onDestroy()` and `stopMediaPlayback()`.
+   - Updated `syncPlayback()` so foreground service initialization is gated: if `playing == false` and the service is not currently active, no unprompted paused notification is created during app startup or state hydration.
+   - Removed all hardcoded mock fallback track/artist/device strings (`"Evening Signals"`, `"Warm Desk Ensemble"`, `"Desk speaker"`) from service properties and `RoomModel.savePersistedState()`.
+
+2. **Spotify OAuth Linking in Demo / Unpaired Mode (`SpotifyConnectActivity.kt`)**:
+   - Made the ESP32 endpoint and pairing requirement optional during `begin()`, enabling Spotify OAuth PKCE browser authorization and encrypted Jetpack DataStore token persistence without requiring a pre-existing physical controller connection.
+
+3. **UI Truncation & Playback Layout Restructuring (`ServiceScreens.kt`, `MainActivity.kt`)**:
+   - OutlinedTextField labels in `SpotifyAccountSettingsCard` simplified to `"OAuth Access Token"` and `"OAuth Refresh Token"` with informative supporting text (`"Encrypted with Keystore AES-GCM in DataStore"`), eliminating clipping and trailing `"..."`.
+   - Redesigned the embedded **Basic Playback Control UI**: provided dedicated full-width track and artist readout with artwork/equalizer badge, preventing any collision with transport buttons. Placed a centered, well-proportioned control bar (`44.dp` / `52.dp` / `44.dp` with `20.dp` spacing) with tactile haptic feedback.
+   - Allowed `SmallLabel` in `MainActivity.kt` to display up to 2 lines with soft wrapping.
+
+4. **Complete Elimination of Mock Demo Data (`RoomModel.kt`, `DeviceScreens.kt`, `MusicPlayerWidget.kt`)**:
+   - Cleared synthetic demo appliances (`"Ceiling fan"`, `"Desk speaker"`) and mock IR commands from `demoState()`.
+   - Removed synthetic 4-device fallback list from `SpotifyDeviceDropdownSelector` in `MusicPlayerWidget.kt`.
+   - Removed mock track and playlist items from `demoRequest` and player views, displaying `"No track playing"` and `"Ready to stream"` until live music playback or paired devices are detected.
+
+
+
+---
+
+## 31. V28 Synchronization Handoff — Android 0.5.4 (versionCode 25): Direct Client-Side Spotify Web API Playback, Device Auto-Wake, Full Search & Playlist Browsing, and Independent Transport Control
+
+Recorded 25 October 2026 (Asia/Calcutta). Project delivery advances from **V27** to **V28**; Android source advances from **0.5.3 / versionCode 24** to **0.5.4 / versionCode 25**. Existing archived baseline APK (`0.3.0 / code 5`) and all earlier sections of this document remain untouched.
+
+### 31.1 Summary of V28 App Changes
+
+1. **Direct Client-Side Spotify Web API Engine (`SpotifyApiClient.kt`)**:
+   - Built a comprehensive HTTP client directly interacting with Spotify's official REST API (`https://api.spotify.com/v1/...`).
+   - Retrieves encrypted tokens from `RoomDataStore` (`KEY_SPOTIFY_ACCESS_TOKEN_ENC`, `KEY_SPOTIFY_REFRESH_TOKEN_ENC`, `KEY_SPOTIFY_CLIENT_ID_ENC`).
+   - Automatically handles token refresh via `https://accounts.spotify.com/api/token` using the refresh token and `SpotifyPkce.CLIENT_ID` when tokens expire or remote 401 Unauthorized responses occur.
+   - Correctly processes HTTP 204 No Content responses from Spotify playback control endpoints (`PUT /me/player/play`, `PUT /me/player/pause`, `POST /me/player/next`, `POST /me/player/previous`, `PUT /me/player/volume`, `PUT /me/player/seek`, `PUT /me/player/shuffle`, `PUT /me/player/repeat`, `PUT /me/player`).
+
+2. **Autonomous Device Discovery & Inactive Device Auto-Wake (`SpotifyApiClient.kt`)**:
+   - Implemented `fetchDevices()` calling `GET /me/player/devices` to discover Spotify Connect speakers, active phones, and desktop sessions.
+   - Enhanced `sendPlayerCommand`: if playback fails because Spotify has gone into an inactive background sleep state (`NO_ACTIVE_DEVICE` / 404), the client queries available devices and automatically wakes the first device by appending `?device_id={id}` to the playback command.
+   - Provided clear, actionable in-app guidance if no Spotify device is online: `"No active Spotify device found. Open Spotify on your phone, laptop, or speaker."`.
+
+3. **Complete Music Search, Playlist Browsing & Real-Time Sync (`SpotifyApiClient.kt`, `RoomModel.kt`, `ServiceScreens.kt`)**:
+   - Added direct API methods for `search(query, offset)`, `fetchPlaylists(offset)`, and `fetchRecentTracks()`.
+   - Wired `handleDirectSpotifyRequest()` in `RoomModel` to route `/spotify/player`, `/spotify/devices`, `/spotify/playback`, `/spotify/search`, `/spotify/playlists`, and `/spotify/recent` through `SpotifyApiClient` whenever OAuth credentials are present.
+   - Added a background loop in `RoomModel` polling Spotify player state every 2.5 seconds when OAuth is connected, syncing live track titles, artist names, high-resolution album cover URLs, seek positions, and shuffle/repeat states directly into `RoomUi.state`.
+
+4. **Direct Playback Routing & UI State Activation (`RoomModel.kt`, `DeviceScreens.kt`, `ServiceScreens.kt`)**:
+   - Updated `spotifyCommand`, `coalescedVolume`, and `RoomMediaPlaybackService.onMediaTransportCommand` to execute directly via `SpotifyApiClient` when OAuth tokens are present, eliminating ESP32 roundtrips and offline timeouts.
+   - Updated `connected` conditions in `DeviceScreens` and `ServiceScreens` to include `ui.spotifyOAuthConnected`, displaying the live player widget, scrubber, and playback controls immediately upon completing Spotify authorization without waiting for an ESP32 connection.
+
+---
+
+## 32. V29 Synchronization Handoff — Android 0.5.5 (versionCode 26): Full-Featured Spotify Music Hub with Magic / Smart Shuffle, Liked Songs Library, Multi-Category Search & Live Queue
+
+Recorded 25 October 2026 (Asia/Calcutta). Project delivery advances from **V28** to **V29**; Android source advances from **0.5.4 / versionCode 25** to **0.5.5 / versionCode 26**. Existing archived baseline APK (`0.3.0 / code 5`) and all earlier sections of this document remain untouched.
+
+### 32.1 Summary of V29 App Changes
+
+1. **3-Way Shuffle & Magic Shuffle / Smart Shuffle (`SpotifyApiClient.kt`, `MusicPlayerWidget.kt`, `ServiceScreens.kt`)**:
+   - Added 3-way shuffle mode cycling: **Off** (`value = 0`), **Standard Shuffle** (`value = 1`), and **✨ Magic Shuffle** (`value = 2` / `"magic"`).
+   - When Magic Shuffle is activated, `SpotifyApiClient` activates Spotify's shuffle mode, queries the recommendations endpoint (`/v1/recommendations?seed_tracks={trackId}&limit=5`), and automatically enqueues recommended tracks into the active playback session, seamlessly blending discovery tracks into the user's music stream.
+   - Designed a tactile Shuffle Mode selector bar directly above the music categories in `MusicScreen` with individual mode chips (`Off`, `Standard`, `✨ Magic Shuffle`) and a quick "Launch Magic Mix" action.
+   - Displayed an animated "✨ Magic Shuffle Active" badge on the player widget when Magic Shuffle mode is engaged.
+
+2. **Full Spotify Search across Tracks, Playlists, Albums & Artists (`SpotifyApiClient.kt`, `RoomModel.kt`, `ServiceScreens.kt`)**:
+   - Extended `SpotifyApiClient.search` to accept a `type` parameter supporting comma-separated `track,playlist,album,artist`.
+   - Built a sleek, responsive search interface in `MusicScreen` with a clearable search bar and instant category filter chips (`All`, `Songs`, `Playlists`, `Albums`, `Artists`).
+   - Search results display album art thumbnails, track title, artist name, and formatted duration (e.g., `3:45`), with direct one-tap playback on card tap and a dedicated `+` button to enqueue tracks directly into Spotify.
+
+3. **Liked Songs Library Browsing & One-Tap "Shuffle Liked" (`SpotifyApiClient.kt`, `SpotifyPkce.kt`, `ServiceScreens.kt`)**:
+   - Extended Spotify OAuth PKCE scopes to include `user-library-read` and `user-library-modify`.
+   - Implemented `SpotifyApiClient.fetchLikedTracks(offset)` calling `GET /v1/me/tracks?limit=30`, unwrapping the `{ "added_at": "...", "track": { ... } }` payload into standard track items.
+   - Handled missing scope HTTP 403 errors gracefully with an inline banner inviting the user to reconnect Spotify in Settings if authorized with an older token version.
+   - Provided a dedicated "Shuffle Liked" hero button in the Liked Songs tab that starts playback of the user's saved tracks library in shuffle mode.
+
+4. **In-Player Favorite / Like Toggle Button (`MusicPlayerWidget.kt`, `SpotifyApiClient.kt`, `RoomModel.kt`)**:
+   - Integrated a Heart icon toggle button (`Icons.Filled.Favorite` in vibrant Pink/Red when saved, `Icons.Outlined.FavoriteBorder` when unsaved) directly adjacent to the track title in `MusicPlayerWidget`.
+   - Dispatches `like` / `unlike` commands via `SpotifyApiClient.saveTrack` (`PUT /v1/me/tracks?ids={id}`) and `SpotifyApiClient.removeTrack` (`DELETE /v1/me/tracks?ids={id}`) with tactile haptic feedback.
+
+5. **Live Queue & Recently Played Browsing (`SpotifyApiClient.kt`, `ServiceScreens.kt`)**:
+   - Implemented `fetchQueue()` querying `GET /v1/me/player/queue`, displaying the currently playing track and the ordered list of upcoming tracks in the Up Next tab.
+   - Implemented `fetchRecentTracks()` querying `GET /v1/me/player/recently-played`, displaying playback history with relative played-at timestamps and quick resume.
+   - Implemented `addToQueue(uri)` calling `POST /v1/me/player/queue?uri={uri}` across search and track lists.
+
+6. **Minimalist, Clutter-Free Material 3 Design**:
+   - Kept the visual hierarchy clean and spacious using consistent 8dp grid spacing, rounded cards, high-contrast typography, and dark theme palette.
+   - Preserved all existing ESP32 lighting, IR, routine, and WLED functions without interference.
+
+
+## 33. V30 Synchronization Handoff — Android 0.5.6 (versionCode 27): Spotify PKCE Developer Client ID Removal, Protected OAuth Validation & Main Directory Reconciliation
+
+Project delivery **V30**. Android source updated to **0.5.6 / versionCode 27**.
+- Removed the hardcoded personal developer Client ID from `SpotifyPkce.kt` (`const val CLIENT_ID = ""`) and all documentation to prevent any unauthorized PKCE usage of the user's Spotify account.
+- Updated `SpotifyPkce.authorization(verifier, state, clientId)` with strict `require(clientId.isNotBlank())` check.
+- Updated `SpotifyConnectActivity.kt` to dynamically read the configured Client ID from `RoomDataStore` / Intent extra (`clientIdInput`), block execution with clean user-facing guidance if unconfigured, and pass the active Client ID to token exchange, encrypted DataStore persistence, and direct ESP32 HTTPS credential provisioning (`op: "spotify_credentials"`).
+- Added graceful null-fallback in `SpotifyApiClient.refreshAccessToken` when Client ID is blank.
+- Updated `ConnectionGuides.kt`, `CONNECTION_GUIDE.md`, and `SPOTIFY_APP_CONNECTION.md` to instruct users on configuring their own Spotify Developer App Client ID.
+- Updated `SpotifyPkceTest.kt` with explicit test coverage for blank Client ID rejection.
+- Reconciled the complete native Android codebase into the root workspace `android/` directory.
+- Preserved connected COM5 hardware (`2.0.2-wled-room`) untouched with zero automatic flash, upload, or ROM resets.

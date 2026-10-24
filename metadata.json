@@ -1,0 +1,6 @@
+{
+  "name": "Room",
+  "description": "Local-first smart room controller for ESP32 lighting, WLED, IR remotes, routines, and Spotify playback.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

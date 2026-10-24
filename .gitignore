@@ -17,3 +17,5 @@
 /app/src/main/assets/room-device.config
 /config/room-device.config
 /.private/
+/public/
+/.aistudio/

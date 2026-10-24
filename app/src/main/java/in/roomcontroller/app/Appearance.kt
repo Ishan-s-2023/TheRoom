@@ -25,17 +25,26 @@ import androidx.compose.ui.unit.sp
 
 data class RoomPalette(val background: Color, val panel: Color, val accent: Color, val muted: Color, val line: Color, val text: Color, val light: Boolean = false)
 private val forest = RoomPalette(Color(0xFF101310),Color(0xFF1C211C),Color(0xFFB5F36A),Color(0xFFA8B1A5),Color(0xFF30392F),Color(0xFFF0F1E9))
+private val obsidian = RoomPalette(Color(0xFF000000),Color(0xFF070707),Color(0xFFE5C158),Color(0xFF9E9E9E),Color(0xFF1C1C1C),Color(0xFFFFFFFF))
 private val midnight = RoomPalette(Color(0xFF0C1020),Color(0xFF181F35),Color(0xFFADBFFF),Color(0xFFA8B1CE),Color(0xFF303C5E),Color(0xFFF0F2FF))
 private val ember = RoomPalette(Color(0xFF1B1411),Color(0xFF2A211C),Color(0xFFFFBF82),Color(0xFFC0ADA1),Color(0xFF49372C),Color(0xFFFFF1E5))
-private val pearl = RoomPalette(Color(0xFFF4F5EF),Color(0xFFFFFFFF),Color(0xFF376126),Color(0xFF5D6859),Color(0xFFD8DFD0),Color(0xFF1A2517),true)
+private val pearl = RoomPalette(Color(0xFFF4F5EF),Color(0xFFFFFFFF),Color(0xFF2E6B1E),Color(0xFF535E4F),Color(0xFFCFD8C6),Color(0xFF151E12),true)
 internal fun roomPalette(selected: String, systemDark: Boolean) = when(selected) {
+    "obsidian", "black" -> obsidian
     "midnight" -> midnight; "ember" -> ember; "pearl" -> pearl
-    "system" -> if(systemDark) forest else pearl
+    "system" -> if(systemDark) obsidian else pearl
     else -> forest
 }
 val LocalRoomPalette = staticCompositionLocalOf { forest }
 data class AppearanceChoice(val id: String, val label: String)
-val appearanceChoices = listOf(AppearanceChoice("forest","Forest"),AppearanceChoice("midnight","Midnight"),AppearanceChoice("ember","Ember"),AppearanceChoice("pearl","Pearl"),AppearanceChoice("system","System"))
+val appearanceChoices = listOf(
+    AppearanceChoice("obsidian","Black"),
+    AppearanceChoice("forest","Forest"),
+    AppearanceChoice("midnight","Midnight"),
+    AppearanceChoice("ember","Ember"),
+    AppearanceChoice("pearl","Pearl"),
+    AppearanceChoice("system","System")
+)
 data class RoomAppearance(val selected: String, val choose: (String)->Unit)
 val LocalRoomAppearance = staticCompositionLocalOf { RoomAppearance("forest",{}) }
 val Ink: Color @Composable get() = LocalRoomPalette.current.background
@@ -73,13 +82,13 @@ val Cream: Color @Composable get() = LocalRoomPalette.current.text
     val appearance = LocalRoomAppearance.current
     RoomCard {
         SectionLabel("Appearance", "THEME")
-        Text("Choose a look for the whole app.",color=Muted,fontSize=12.sp)
+        Text("Choose a look for the whole app, including pure Black high-contrast or Light Pearl.",color=Muted,fontSize=12.sp)
         @OptIn(ExperimentalLayoutApi::class)
         FlowRow(horizontalArrangement=Arrangement.spacedBy(10.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
             appearanceChoices.forEach {choice ->
-                val sample = when(choice.id) {"midnight"->midnight;"ember"->ember;"pearl"->pearl;else->forest}
+                val sample = when(choice.id) {"obsidian"->obsidian;"midnight"->midnight;"ember"->ember;"pearl"->pearl;else->forest}
                 val active = appearance.selected==choice.id
-                Column(Modifier.width(90.dp).clip(RoundedCornerShape(14.dp)).background(sample.panel)
+                Column(Modifier.width(92.dp).clip(RoundedCornerShape(14.dp)).background(sample.panel)
                     .border(if(active)2.dp else 1.dp,if(active)Lime else Line,RoundedCornerShape(14.dp))
                     .clickable {appearance.choose(choice.id)}.padding(12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
                     Row(verticalAlignment=Alignment.CenterVertically) {
