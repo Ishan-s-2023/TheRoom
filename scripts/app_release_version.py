@@ -28,10 +28,13 @@ def app_version(root):
 
 
 def delivery_version(root):
-    text = (root / "VERSION.md").read_text(encoding="utf-8-sig")
+    version_file = root / "DELIVERY_VERSION.md"
+    if not version_file.is_file():
+        version_file = root / "VERSION.md"
+    text = version_file.read_text(encoding="utf-8-sig")
     version = re.search(r"^# .*\bVersion (\d+) \(V\d+\)", text, re.MULTILINE)
     if not version:
-        raise ValueError("Record the current project delivery at the top of VERSION.md")
+        raise ValueError(f"Record the current project delivery at the top of {version_file.name}")
     return int(version[1])
 
 
@@ -50,7 +53,7 @@ def check_next_version(root):
             "The existing final APK is preserved."
         )
     if releases and delivery_version(root) <= max(item["project_delivery"] for item in releases):
-        raise ValueError("Assign the next project delivery in VERSION.md and update the sync handoff before a new app delivery")
+        raise ValueError("Assign the next project delivery in DELIVERY_VERSION.md (or VERSION.md) and update the sync handoff before a new app delivery")
     return name, code
 
 
@@ -118,7 +121,9 @@ def archive_release(root, report):
     temporary = path.with_suffix(".json.tmp")
     temporary.write_text(json.dumps(records, indent=2) + "\n", encoding="utf-8")
     temporary.replace(path)
-    ledger = root / "versions.md"
+    ledger = root / "CHANGELOG.md"
+    if not ledger.exists():
+        ledger = root / "versions.md"
     if not ledger.exists():
         ledger.write_text("# Project and Android release ledger\n", encoding="utf-8")
     with ledger.open("a", encoding="utf-8") as stream:

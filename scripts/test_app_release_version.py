@@ -36,9 +36,10 @@ class AppReleaseVersionTests(unittest.TestCase):
     def test_archives_exact_bytes_and_repeated_registration_is_idempotent(self):
         report = self.report()
         first = archive_release(self.root, report)
-        ledger_before = (self.root / "versions.md").read_bytes()
+        ledger_path = self.root / ("CHANGELOG.md" if (self.root / "CHANGELOG.md").exists() else "versions.md")
+        ledger_before = ledger_path.read_bytes()
         self.assertEqual(first, archive_release(self.root, report))
-        self.assertEqual(ledger_before, (self.root / "versions.md").read_bytes())
+        self.assertEqual(ledger_before, ledger_path.read_bytes())
         self.assertEqual(report["apk_sha256"], hashlib.sha256((self.root / first["artifacts"]["apk"]).read_bytes()).hexdigest())
         self.assertIn("V7-android-0.3.0-code5", first["artifacts"]["apk"])
 

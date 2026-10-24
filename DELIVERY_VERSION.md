@@ -1,3 +1,20 @@
+# SmartRoom Controller — Version 32 (V32)
+
+Current project delivery, 25 October 2026 (Asia/Calcutta). Previous delivery: V31.
+
+- Delivery version: **V32**; previous delivery: **V31**.
+- Documentation & Ledger Standardization:
+  - Resolved versioning ledger collision by permanently renaming ambiguous filenames:
+    - Renamed Android app release ledger from `versions.md` to `CHANGELOG.md` following standard open-source conventions.
+    - Renamed project delivery milestone tracking from `VERSION.md` to `DELIVERY_VERSION.md` to cleanly separate global project deliveries from internal Android semver releases.
+  - Retained `AGENTS.md`, `README.md`, and `ESP32_APP_SYNC_CONTEXT.md` with standard names as confirmed by user direction.
+  - Updated build verification tooling (`scripts/app_release_version.py` and `scripts/test_app_release_version.py`) to seamlessly support `DELIVERY_VERSION.md` and `CHANGELOG.md` with backwards-compatible fallbacks.
+  - Updated all markdown documentation links across root and `android/` repositories.
+- Android source baseline remains **0.5.6 / versionCode 27**. Verified offline APK baseline remains **0.3.0 / versionCode 5**.
+- Combined ESP32 target firmware contract remains **2.0.2-wled-room**; physical COM5 hardware remains protected and untouched.
+
+Earlier deliveries are retained below.
+
 # SmartRoom Controller — Version 31 (V31)
 
 Current project delivery, 25 October 2026 (Asia/Calcutta). Previous delivery: V30.

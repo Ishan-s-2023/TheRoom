@@ -3,8 +3,8 @@
 [![Android Build](https://img.shields.io/badge/Android-API%2034-green.svg)](https://developer.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.9.22-blue.svg)](https://kotlinlang.org/)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2024.02.00-purple.svg)](https://developer.android.com/jetpack/compose)
-[![Version](https://img.shields.io/badge/App%20Version-0.5.6%20(code%2027)-orange.svg)](versions.md)
-[![Delivery](https://img.shields.io/badge/Delivery%20Version-V31-blueviolet.svg)](VERSION.md)
+[![Version](https://img.shields.io/badge/App%20Version-0.5.6%20(code%2027)-orange.svg)](CHANGELOG.md)
+[![Delivery](https://img.shields.io/badge/Delivery%20Version-V32-blueviolet.svg)](DELIVERY_VERSION.md)
 [![License](https://img.shields.io/badge/License-Proprietary%20%2F%20Private-lightgrey.svg)](#security--privacy)
 
 **TheRoom** is a local-first, privacy-respecting Android application designed to orchestrate smart room hardware. It delivers unified control across a custom **ESP32 Smart Room Controller** and addressable LED fixtures running **WLED**, coupled with a client-side **Spotify Web API** remote featuring RFC 7636 PKCE authentication.
@@ -97,8 +97,8 @@ TheRoom/
 ├── build.gradle.kts                    # Root build configuration
 ├── settings.gradle.kts                 # Project module settings
 ├── gradle.properties                   # JVM memory flags and AndroidX properties
-├── versions.md                         # Android release history & internal version ledger
-└── VERSION.md                          # Global project delivery milestones (V1 – V31)
+├── CHANGELOG.md                        # Android release history & internal version ledger
+└── DELIVERY_VERSION.md                 # Global project delivery milestones (V1 – V32)
 ```
 
 ---
@@ -326,13 +326,13 @@ TheRoom is architected with a strict privacy-first philosophy:
 ## Release History & Versioning
 
 The project adheres to strict versioning and delivery standards:
-- **Project Delivery Version**: **V31** (Recorded in `VERSION.md`).
-- **Android App Version**: **`0.5.6`** | **`versionCode: 27`** (Recorded in `app/build.gradle.kts` and `versions.md`).
+- **Project Delivery Version**: **V32** (Recorded in `DELIVERY_VERSION.md`).
+- **Android App Version**: **`0.5.6`** | **`versionCode: 27`** (Recorded in `app/build.gradle.kts` and `CHANGELOG.md`).
 - **Verified Offline Baseline**: `0.3.0 / versionCode 5` (`ROOM-ANDROID-0.3.0+5`).
 
-For detailed changelogs of all delivery milestones from V1 to V31, see:
-- [`VERSION.md`](VERSION.md) — Delivery milestones, handoffs, and verification hashes.
-- [`versions.md`](versions.md) — Chronological Android build ledger and detailed feature release notes.
+For detailed changelogs of all delivery milestones from V1 to V32, see:
+- [`DELIVERY_VERSION.md`](DELIVERY_VERSION.md) — Delivery milestones, handoffs, and verification hashes.
+- [`CHANGELOG.md`](CHANGELOG.md) — Chronological Android build ledger and detailed feature release notes.
 - [`knowledge/docs/CONNECTION_GUIDE.md`](knowledge/docs/CONNECTION_GUIDE.md) — Detailed hardware and Spotify connection walk-throughs.
 - [`artifacts/WLED_PARITY_INVENTORY.md`](artifacts/WLED_PARITY_INVENTORY.md) — Comprehensive inventory of all native WLED controls and API endpoints.
 

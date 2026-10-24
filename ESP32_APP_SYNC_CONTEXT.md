@@ -9132,3 +9132,15 @@ Project delivery **V31**. Android source baseline remains **0.5.6 / versionCode 
   - Security and privacy architecture detailing local-first design and zero hardcoded credentials.
 - Updated root `README.md` with modern quick links and cross-references.
 - Preserved connected COM5 hardware (`2.0.2-wled-room`) untouched with zero automatic flash, upload, or ROM resets.
+
+
+## 35. V32 Synchronization Handoff — Release Ledger & Documentation Standardization
+
+Project delivery **V32**. Android source baseline remains **0.5.6 / versionCode 27**. Verified offline APK baseline remains **0.3.0 / versionCode 5**.
+- Resolved ledger naming collision:
+  - Renamed Android app release ledger from `versions.md` to `CHANGELOG.md` following standard open-source conventions.
+  - Renamed project delivery milestone tracking from `VERSION.md` to `DELIVERY_VERSION.md` to cleanly separate global project deliveries from internal Android semver releases.
+- Retained `AGENTS.md`, `README.md`, and `ESP32_APP_SYNC_CONTEXT.md` with standard names as confirmed by user direction.
+- Updated release build automation scripts (`scripts/app_release_version.py` and `scripts/test_app_release_version.py`) to recognize `CHANGELOG.md` and `DELIVERY_VERSION.md`.
+- Updated all cross-references in `README.md` and synchronization handoffs.
+- Preserved connected COM5 hardware (`2.0.2-wled-room`) untouched with zero automatic flash, upload, or ROM resets.

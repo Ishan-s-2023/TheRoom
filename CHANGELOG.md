@@ -291,3 +291,12 @@ Project delivery **V31**. Android source baseline remains **0.5.6 / versionCode 
 
 
 
+
+## V32 — Release Ledger & Documentation Standardization
+
+Project delivery **V32**. Android source baseline remains **0.5.6 / versionCode 27**. Verified offline APK baseline remains **0.3.0 / versionCode 5**.
+- Standardized Android release ledger filename: renamed `versions.md` → `CHANGELOG.md`.
+- Standardized project delivery tracking filename: renamed `VERSION.md` → `DELIVERY_VERSION.md`.
+- Updated release build automation scripts (`scripts/app_release_version.py`) to recognize `CHANGELOG.md` and `DELIVERY_VERSION.md`.
+- Updated all cross-references in `README.md` and synchronization handoffs.
+- See section 35 of `ESP32_APP_SYNC_CONTEXT.md`.
